@@ -5,6 +5,7 @@
 
 Se pretende crear la siguiente estructura:
 
+<pre>
 
 |   cacceso0    |           | cacceso1 |
 
@@ -14,6 +15,7 @@ c0n0   c0n1 ... |           |   c1n0   c1n1 ...
                 =============
                   |       |
                  (r0)    (r0)
+</pre>
 
 Donde c0 y c1 son instancias de ns3::NodeContainer, y representan, respectivamente, a la red de
 una empresa y a internet. Cada red puede contener tantos nodos como se desee. Para unir dichas
