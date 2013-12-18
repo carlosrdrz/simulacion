@@ -27,17 +27,18 @@ main ( int argc, char * argv[])
   CommandLine cmd;
   cmd.Parse (argc, argv);
 
-  NS_LOG_INFO ("Create nodes.");
-  NodeContainer c;
-  c.Create (4);
-  // We will later want two subcontainers of these nodes, for the two LANs
-  //Cada NodeContainer para una subred. En total son 3 subredes.
-  NodeContainer cacceso0 = NodeContainer (c.Get (0), c.Get (1));
-  NodeContainer ctroncal = NodeContainer (c.Get (1), c.Get (2));
-  NodeContainer cacceso1 = NodeContainer (c.Get (2), c.Get(3));
+  NodeContainer acceso1;
+  acceso1.Create (2);
+  NodeContainer acceso2;
+  acceso2.Create(2);
+  NodeContainer troncal;
+  troncal.Create(2);
+
+  //Ptr<Node> Router1 = troncal.Get(0);  //Con esto podemos acceder a cada router
+  //Ptr<Node> Router2 = troncal.Get(1);
 
 
-  NS_LOG_INFO ("Build Topology.");
+  NS_LOG_INFO ("Topologia");
   //CsmaHelper para las redes de acceso
   CsmaHelper csma_acceso;
   csma_acceso.SetChannelAttribute ("DataRate", DataRateValue (DataRate (5000000)));
@@ -49,14 +50,19 @@ main ( int argc, char * argv[])
   
 
   // We will use these NetDevice containers later, for IP addressing
-  NetDeviceContainer ndacceso0 = csma.Install (cacceso0);  // Primera red de acceso
-  NetDeviceContainer ndacceso1 = csma.Install (cacceso1);  // Segunda red de acceso
-  NetDeviceContainer ndtroncal = csma.Install (ctroncal);  // Red troncal
+  NetDeviceContainer ndacceso1 = csma.Install (acceso1);  // Primera red de acceso
+  NetDeviceContainer ndacceso2 = csma.Install (acceso2);  // Segunda red de acceso
+  NetDeviceContainer ndtroncal = csma.Install (troncal);  // Red troncal
 
 
   NS_LOG_INFO ("Add IP Stack.");
-  InternetStackHelper internet;
-  internet.Install (c);
+  InternetStackHelper internet_acceso1;
+  InternetStackHelper internet_acceso2;
+  InternetStackHelper internet_troncal;
+  internet_acceso1.Install (acceso1);
+  internet_acceso2.Install (acceso2);
+  internet_troncal.Install (troncal);
+
 
   NS_LOG_INFO ("Assign IP Addresses.");
   Ipv4AddressHelper ipv4Addr;
@@ -67,6 +73,7 @@ main ( int argc, char * argv[])
   ipv4Addr.SetBase ("10.1.3.0", "255.255.255.0");
   ipv4Addr.Assign (ndtroncal);
   
+
 
 
 }
