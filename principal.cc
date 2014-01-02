@@ -28,13 +28,13 @@ main ( int argc, char * argv[])
   // run-time, via command-line arguments
   CommandLine cmd;
   cmd.Parse (argc, argv);
-
-  NodeContainer acceso1;
-  acceso1.Create (2);
-  NodeContainer acceso2;
-  acceso2.Create(2);
-  NodeContainer troncal;
-  troncal.Create(2);
+  
+  NodeContainer nodos;
+  nodos.Create(6);
+ 
+  NodeContainer acceso1 = NodeContainer (nodos.Get (0), nodos.Get (1), nodos.Get(2));
+  NodeContainer acceso2 = NodeContainer (nodos.Get(3), nodos.Get(4), nodos.Get(5));
+  NodeContainer troncal = NodeContainer (nodos.Get(2), nodos.Get(3));
 
   //Ptr<Node> Router1 = troncal.Get(0);  //Con esto podemos acceder a cada router
   //Ptr<Node> Router2 = troncal.Get(1);
