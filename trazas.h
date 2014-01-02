@@ -20,7 +20,11 @@ public:
 
 private:
   //Variable que cuenta los paquetes cuyo envío ha finalizado.
-  int envios_finalizados;
+  int envia_L;
+  int recibe_L;
+  int envia_R;
+  int envia_L;
+
 };
 #endif
 
