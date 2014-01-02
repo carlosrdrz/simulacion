@@ -42,19 +42,21 @@ main ( int argc, char * argv[])
 
   NS_LOG_INFO ("Topologia");
   //CsmaHelper para las redes de acceso
-  CsmaHelper csma;
-  csma_acceso.SetChannelAttribute ("DataRate", DataRateValue (DataRate (5000000)));
-  csma_acceso.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
+  CsmaHelper csma_acceso1,csma_acceso2;
+  csma_acceso1.SetChannelAttribute ("DataRate", DataRateValue (DataRate (5000000)));
+  csma_acceso2.SetChannelAttribute ("DataRate", DataRateValue (DataRate (5000000)));
+  csma_acceso1.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
+  csma_acceso2.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
   //PointToPointHelper para la red troncal
   PointToPointHelper point;
 
-  csma_troncal.SetChannelAttribute ("DataRate", DataRateValue (DataRate (5000000)));
-  csma_troncal.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
+  point.SetChannelAttribute ("DataRate", DataRateValue (DataRate (5000000)));
+  point.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
   
 
   // We will use these NetDevice containers later, for IP addressing
-  NetDeviceContainer ndacceso1 = csma.Install (acceso1);  // Primera red de acceso
-  NetDeviceContainer ndacceso2 = csma.Install (acceso2);  // Segunda red de acceso
+  NetDeviceContainer ndacceso1 = csma_acceso1.Install (acceso1);  // Primera red de acceso
+  NetDeviceContainer ndacceso2 = csma_acceso2.Install (acceso2);  // Segunda red de acceso
   NetDeviceContainer ndtroncal = point.Install (troncal);  // Red troncal
 
 
@@ -78,22 +80,23 @@ main ( int argc, char * argv[])
   
   //Aplicación ON OFF para probar la topología.
   uint16_t port=9;
-  ApplicationContainer app = onoff.Install (acceso1.Get (0));
-  app.Start (Seconds (1.0));
-  app.Stop (Seconds (10.0));
+  // ApplicationContainer app = onoff.Install (acceso1.Get (0));
+  // app.Start (Seconds (1.0));
+  // app.Stop (Seconds (10.0));
 
   //Sumidero
   PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port)));
-  onoff.SetConstantRate (DataRate ("500kb/s"));
+  //onoff.SetConstantRate (DataRate ("500kb/s"));
 
-  app = sink.Install (acceso2.Get (0));
-  app.Add (sink.Install (acceso2.Get(1)));
-  app.Start (Seconds (1.0));
-  app.Stop (Seconds (10.0));
+  // app = sink.Install (acceso2.Get (0));
+  // app.Add (sink.Install (acceso2.Get(1)));
+  // app.Start (Seconds (1.0));
+  // app.Stop (Seconds (10.0));
 
   AsciiTraceHelper ascii;
-  csma.EnableAsciiAll (ascii.CreateFileStream ("csma-prueba.tr"));
-  csma.EnablePcapAll ("csma-prueba", false);
+  // csma.EnableAsciiAll (ascii.CreateFileStream ("csma-prueba.tr"));
+  csma_acceso1.EnablePcapAll ("csma-acceso1", false);
+  csma_acceso2.EnablePcapAll ("csma-acceso2", false);
 
   NS_LOG_INFO ("Run Simulation");
   Simulator::Run();
