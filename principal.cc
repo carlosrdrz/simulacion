@@ -97,7 +97,13 @@ main ( int argc, char * argv[])
 
   //Sumidero
   uint16_t port=9;
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port)));  
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port))); 
+
+
+  ApplicationContainer sinkC = sink.Install (acceso2.Get (1)); // Node n4 
+  // Start the sink
+  sinkC.Start (Seconds (1.0));
+  sinkC.Stop (Seconds (10.0)); 
 
   AsciiTraceHelper ascii;
   // csma.EnableAsciiAll (ascii.CreateFileStream ("csma-prueba.tr"));
