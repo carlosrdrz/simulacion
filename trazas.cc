@@ -1,3 +1,4 @@
+#if 0
 /*
   Fichero para la clase Trazas
   A partir de esta clase se obtendrán las trazas 
@@ -36,3 +37,5 @@ Trazas::GetEnviosFin()
 {
   return envios_finalizados;
 }
+
+#endif

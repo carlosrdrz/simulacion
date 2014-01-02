@@ -1,3 +1,4 @@
+# if 0
 /*
   Trazas.h
   librería de la clase Trazas
@@ -21,3 +22,5 @@ private:
   //Variable que cuenta los paquetes cuyo envío ha finalizado.
   int envios_finalizados;
 };
+#endif
+
