@@ -28,37 +28,33 @@ main ( int argc, char * argv[])
   // run-time, via command-line arguments
   CommandLine cmd;
   cmd.Parse (argc, argv);
-
-  NodeContainer acceso1;
-  acceso1.Create (2);
-  NodeContainer acceso2;
-  acceso2.Create(2);
-  NodeContainer troncal;
-  troncal.Create(2);
+  
+  NodeContainer nodos;
+  nodos.Create(6);
+ 
+  NodeContainer acceso1 = NodeContainer (nodos.Get (0), nodos.Get (1), nodos.Get(2));
+  NodeContainer acceso2 = NodeContainer (nodos.Get(3), nodos.Get(4), nodos.Get(5));
+  NodeContainer troncal = NodeContainer (nodos.Get(2), nodos.Get(3));
 
   //Ptr<Node> Router1 = troncal.Get(0);  //Con esto podemos acceder a cada router
   //Ptr<Node> Router2 = troncal.Get(1);
 
-
   NS_LOG_INFO ("Topologia");
   //CsmaHelper para las redes de acceso
-  CsmaHelper csma_acceso1,csma_acceso2;
+  CsmaHelper csma_acceso1, csma_acceso2;
   csma_acceso1.SetChannelAttribute ("DataRate", DataRateValue (DataRate (5000000)));
   csma_acceso2.SetChannelAttribute ("DataRate", DataRateValue (DataRate (5000000)));
   csma_acceso1.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
   csma_acceso2.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
   //PointToPointHelper para la red troncal
   PointToPointHelper point;
-
   point.SetChannelAttribute ("DataRate", DataRateValue (DataRate (5000000)));
   point.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
   
-
   // We will use these NetDevice containers later, for IP addressing
   NetDeviceContainer ndacceso1 = csma_acceso1.Install (acceso1);  // Primera red de acceso
   NetDeviceContainer ndacceso2 = csma_acceso2.Install (acceso2);  // Segunda red de acceso
-  NetDeviceContainer ndtroncal = point.Install (troncal);  // Red troncal
-
+  NetDeviceContainer ndtroncal = point.Install (troncal);         // Red troncal
 
   NS_LOG_INFO ("Add IP Stack.");
   InternetStackHelper internet_acceso1;
@@ -67,7 +63,6 @@ main ( int argc, char * argv[])
   internet_acceso1.Install (acceso1);
   internet_acceso2.Install (acceso2);
   internet_troncal.Install (troncal);
-
 
   NS_LOG_INFO ("Assign IP Addresses.");
   Ipv4AddressHelper ipv4Addr;
@@ -79,19 +74,16 @@ main ( int argc, char * argv[])
   ipv4Addr.Assign (ndtroncal);
   
   //Aplicación ON OFF para probar la topología.
-  uint16_t port=9;
-  // ApplicationContainer app = onoff.Install (acceso1.Get (0));
-  // app.Start (Seconds (1.0));
-  // app.Stop (Seconds (10.0));
+  OnOffHelper onoff ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), 4566)));
+  onoff.SetConstantRate (DataRate ("500kb/s"));
+  
+  ApplicationContainer app = onoff.Install (acceso1.Get (0));
+  app.Start (Seconds (1.0));
+  app.Stop (Seconds (10.0));
 
   //Sumidero
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port)));
-  //onoff.SetConstantRate (DataRate ("500kb/s"));
-
-  // app = sink.Install (acceso2.Get (0));
-  // app.Add (sink.Install (acceso2.Get(1)));
-  // app.Start (Seconds (1.0));
-  // app.Stop (Seconds (10.0));
+  uint16_t port=9;
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port)));  
 
   AsciiTraceHelper ascii;
   // csma.EnableAsciiAll (ascii.CreateFileStream ("csma-prueba.tr"));
@@ -102,7 +94,4 @@ main ( int argc, char * argv[])
   Simulator::Run();
   Simulator::Destroy ();
   NS_LOG_INFO ("Done");
-  
-  
-
 }
