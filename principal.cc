@@ -73,12 +73,8 @@ main ( int argc, char * argv[])
   NetDeviceContainer ndtroncal = point.Install (troncal);         // Red troncal
 
   NS_LOG_INFO ("Add IP Stack.");
-  InternetStackHelper internet_acceso1;
-  InternetStackHelper internet_acceso2;
-  InternetStackHelper internet_troncal;
-  internet_acceso1.Install (acceso1);
-  internet_acceso2.Install (acceso2);
-  internet_troncal.Install (troncal);
+  InternetStackHelper internet;
+  internet.Install (nodos);
 
   NS_LOG_INFO ("Assign IP Addresses.");
   Ipv4AddressHelper ipv4Addr;
