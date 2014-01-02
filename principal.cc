@@ -24,8 +24,8 @@ main ( int argc, char * argv[])
 {
    Config::SetDefault ("ns3::CsmaNetDevice::EncapsulationMode", StringValue ("Dix"));
 
-  //unsigned nodos_acceso_1 = 2;
-  //unsigned nodos_acceso_2 = 2;
+  unsigned nodos_acceso_1 = 2;
+  unsigned nodos_acceso_2 = 2;
   std::string data_rate_1   = "5Mbps";
   std::string data_rate_2   = "5Mbps";
   std::string data_rate_t   = "5Mbps";
@@ -34,8 +34,8 @@ main ( int argc, char * argv[])
   std::string delay_t       = "0.002";
 
   CommandLine cmd; // @FIXME
-  //cmd.AddValue("NumeroNodosAcceso1", "Número de nodos en la red de acceso 1", nodos_acceso_1);
-  //cmd.AddValue("NumeroNodosAcceso2", "Número de nodos en la red de acceso 2", nodos_acceso_2);
+  cmd.AddValue("NumeroNodosAcceso1", "Número de nodos en la red de acceso 1", nodos_acceso_1);
+  cmd.AddValue("NumeroNodosAcceso2", "Número de nodos en la red de acceso 2", nodos_acceso_2);
   cmd.AddValue("DataRate1",          "Capacidad de la red de acceso 1",       data_rate_1);
   cmd.AddValue("DataRate2",          "Capacidad de la red de acceso 2",       data_rate_2);
   cmd.AddValue("DataRatet",          "Capacidad de la red troncal",           data_rate_2);
@@ -43,13 +43,13 @@ main ( int argc, char * argv[])
   cmd.AddValue("Delay2",             "Retardo de la red de acceso 2",         delay_2);
   cmd.AddValue("Delayt",             "Retardo de la red troncal",             delay_t);
   cmd.Parse (argc, argv);
-
-  NodeContainer nodos;
-  nodos.Create(6);
  
-  NodeContainer acceso1 = NodeContainer (nodos.Get (0), nodos.Get (1), nodos.Get(2));
-  NodeContainer acceso2 = NodeContainer (nodos.Get(3), nodos.Get(4), nodos.Get(5));
-  NodeContainer troncal = NodeContainer (nodos.Get(2), nodos.Get(3));
+  NodeContainer acceso1, acceso2, troncal;
+  troncal.Create(2);
+  acceso1.Create(nodos_acceso_1);
+  acceso1.Add(troncal.Get (0));
+  acceso2.Create(nodos_acceso_2);
+  acceso2.Add(troncal.Get (1));
 
   //Ptr<Node> Router1 = troncal.Get(0);  //Con esto podemos acceder a cada router
   //Ptr<Node> Router2 = troncal.Get(1);
@@ -73,8 +73,10 @@ main ( int argc, char * argv[])
   NetDeviceContainer ndtroncal = point.Install (troncal);         // Red troncal
 
   NS_LOG_INFO ("Add IP Stack.");
-  InternetStackHelper internet;
-  internet.Install (nodos);
+  InternetStackHelper internet_acceso1;
+  internet_acceso1.Install (acceso1);
+  InternetStackHelper internet_acceso2;
+  internet_acceso2.Install (acceso2);
 
   NS_LOG_INFO ("Assign IP Addresses.");
   Ipv4AddressHelper ipv4Addr;
