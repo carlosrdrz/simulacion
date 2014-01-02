@@ -26,13 +26,31 @@ main ( int argc, char * argv[])
 
   // Allow the user to override any of the defaults at
   // run-time, via command-line arguments
+
+  unsigned nodos_acceso_1 = 2;
+  unsigned nodos_acceso_2 = 2;
+  std::string data_rate_1   = "5Mbps";
+  std::string data_rate_2   = "5Mbps";
+  std::string data_rate_t   = "5Mbps";
+  std::string delay_1       = "0.002";
+  std::string delay_2       = "0.002";
+  std::string delay_t       = "0.002";
+
   CommandLine cmd;
+  cmd.AddValue("NumeroNodosAcceso1", "Número de nodos en la red de acceso 1", nodos_acceso_1);
+  cmd.AddValue("NumeroNodosAcceso2", "Número de nodos en la red de acceso 2", nodos_acceso_2);
+  cmd.AddValue("DataRate1",          "Capacidad de la red de acceso 1",       data_rate_1);
+  cmd.AddValue("DataRate2",          "Capacidad de la red de acceso 2",       data_rate_2);
+  cmd.AddValue("DataRatet",          "Capacidad de la red troncal",           data_rate_2);
+  cmd.AddValue("Delay1",             "Retardo de la red de acceso 1",         delay_1);
+  cmd.AddValue("Delay2",             "Retardo de la red de acceso 2",         delay_2);
+  cmd.AddValue("Delayt",             "Retardo de la red troncal",             delay_t);
   cmd.Parse (argc, argv);
 
   NodeContainer acceso1;
-  acceso1.Create (2);
+  acceso1.Create(nodos_acceso_1);
   NodeContainer acceso2;
-  acceso2.Create(2);
+  acceso2.Create(nodos_acceso_2);
   NodeContainer troncal;
   troncal.Create(2);
 
@@ -41,17 +59,17 @@ main ( int argc, char * argv[])
 
 
   NS_LOG_INFO ("Topologia");
-  //CsmaHelper para las redes de acceso
+  // Redes de acceso
   CsmaHelper csma_acceso1,csma_acceso2;
-  csma_acceso1.SetChannelAttribute ("DataRate", DataRateValue (DataRate (5000000)));
-  csma_acceso2.SetChannelAttribute ("DataRate", DataRateValue (DataRate (5000000)));
-  csma_acceso1.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
-  csma_acceso2.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
-  //PointToPointHelper para la red troncal
+  csma_acceso1.SetChannelAttribute ("DataRate", DataRateValue (DataRate (data_rate_1)));
+  csma_acceso1.SetChannelAttribute ("Delay", StringValue (delay_1));
+  csma_acceso2.SetChannelAttribute ("DataRate", DataRateValue (DataRate (data_rate_2)));
+  csma_acceso2.SetChannelAttribute ("Delay", StringValue (delay_2));
+  
+  // Red troncal
   PointToPointHelper point;
-
-  point.SetChannelAttribute ("DataRate", DataRateValue (DataRate (5000000)));
-  point.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
+  point.SetDeviceAttribute ("DataRate", DataRateValue (DataRate (data_rate_t)));
+  point.SetChannelAttribute ("Delay", StringValue (delay_t)); 
   
 
   // We will use these NetDevice containers later, for IP addressing
