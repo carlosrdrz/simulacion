@@ -11,9 +11,7 @@ public:
 
   virtual ~Trazas ();
 
-  void EventoEnviarFin (Ptr<const Packet> paquete);
-
-  int GetEnviosFin();
+  void 
 
 
 
