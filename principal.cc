@@ -22,7 +22,7 @@ NS_LOG_COMPONENT_DEFINE ("CsmaMulticastExample");
 int
 main ( int argc, char * argv[])
 {
-   Config::SetDefault ("ns3::CsmaNetDevice::EncapsulationMode", StringValue ("Dix"));
+  Config::SetDefault ("ns3::CsmaNetDevice::EncapsulationMode", StringValue ("Dix"));
 
   unsigned nodos_acceso_1 = 2;
   unsigned nodos_acceso_2 = 2;
@@ -56,7 +56,7 @@ main ( int argc, char * argv[])
 
   NS_LOG_INFO ("Creando Topologia");
   // Redes de acceso
-  CsmaHelper csma_acceso1,csma_acceso2;
+  CsmaHelper csma_acceso1, csma_acceso2;
   csma_acceso1.SetChannelAttribute ("DataRate", DataRateValue (DataRate (data_rate_1)));
   csma_acceso1.SetChannelAttribute ("Delay", StringValue (delay_1));
   csma_acceso2.SetChannelAttribute ("DataRate", DataRateValue (DataRate (data_rate_2)));
@@ -80,30 +80,32 @@ main ( int argc, char * argv[])
 
   NS_LOG_INFO ("Assign IP Addresses.");
   Ipv4AddressHelper ipv4Addr;
+  Ipv4InterfaceContainer icacceso1, icacceso2, ictroncal;
   ipv4Addr.SetBase ("10.1.1.0", "255.255.255.0");
-  ipv4Addr.Assign (ndacceso1);
+  icacceso1 = ipv4Addr.Assign (ndacceso1);
   ipv4Addr.SetBase ("10.1.2.0", "255.255.255.0");
-  ipv4Addr.Assign (ndacceso2);
+  icacceso2 = ipv4Addr.Assign (ndacceso2);
   ipv4Addr.SetBase ("10.1.3.0", "255.255.255.0");
-  ipv4Addr.Assign (ndtroncal);
+  ictroncal = ipv4Addr.Assign (ndtroncal);
+
+  // Popular tablas de routing
+  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
   
-  //Aplicación ON OFF para probar la topología.
-  OnOffHelper onoff ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), 4566)));
+  // Sumidero
+  uint16_t port = 8421;
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port)));
+  
+  ApplicationContainer sinkC = sink.Install (acceso2.Get (1)); // Node n4
+  sinkC.Start (Seconds (1.0));
+  sinkC.Stop (Seconds (10.0));
+
+  // Aplicacion OnOff
+  OnOffHelper onoff ("ns3::UdpSocketFactory", Address (InetSocketAddress (icacceso2.GetAddress (1), port)));
   onoff.SetConstantRate (DataRate ("500kb/s"));
-  
+
   ApplicationContainer app = onoff.Install (acceso1.Get (0));
   app.Start (Seconds (1.0));
   app.Stop (Seconds (10.0));
-
-  //Sumidero
-  uint16_t port=9;
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port))); 
-
-
-  ApplicationContainer sinkC = sink.Install (acceso2.Get (1)); // Node n4 
-  // Start the sink
-  sinkC.Start (Seconds (1.0));
-  sinkC.Stop (Seconds (10.0)); 
 
   AsciiTraceHelper ascii;
   // csma.EnableAsciiAll (ascii.CreateFileStream ("csma-prueba.tr"));
