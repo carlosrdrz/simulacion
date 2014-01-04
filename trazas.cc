@@ -1,4 +1,4 @@
-#if 0
+//#if 0
 /*
   Fichero para la clase Trazas
   A partir de esta clase se obtendrán las trazas 
@@ -92,4 +92,4 @@ Trazas::ImprimeTrazas()
   std::cout<<"Paquetes recibidos por el router 1: "<<recibe_1<<std::endl;
 }
 
-#endif
+//#endif

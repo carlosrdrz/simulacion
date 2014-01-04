@@ -1,4 +1,4 @@
-#if 0
+//#if 0
 /*
   Fichero: trazas.h
   Librería de la clase Trazas
@@ -55,4 +55,4 @@ private:
 
 };
 
-#endif
+//#endif

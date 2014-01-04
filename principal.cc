@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <stdlib.h>
 #include <cassert>
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
@@ -14,6 +15,9 @@
 #include "ns3/applications-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/point-to-point-module.h"
+#include "ns3/callback.h"
+#include "ns3/internet-module.h"
+#include "trazas.h"
 
 using namespace ns3;
 
@@ -22,8 +26,14 @@ NS_LOG_COMPONENT_DEFINE ("CsmaMulticastExample");
 int
 main ( int argc, char * argv[])
 {
+  ///////LOG//////////////////////
+  LogComponentEnable("Trazas", LOG_LEVEL_INFO);
+  LogComponentEnable("CsmaMulticastExample", LOG_LEVEL_INFO);
+  //LogComponentEnable("Trazas", LOG_LEVEL_ALL);
+
   Config::SetDefault ("ns3::CsmaNetDevice::EncapsulationMode", StringValue ("Dix"));
 
+  bool tracing=true;
   unsigned nodos_acceso_1 = 2;
   unsigned nodos_acceso_2 = 2;
   std::string data_rate_1   = "5Mbps";
@@ -66,7 +76,7 @@ main ( int argc, char * argv[])
   PointToPointHelper point;
   point.SetDeviceAttribute ("DataRate", DataRateValue (DataRate (data_rate_t)));
   point.SetChannelAttribute ("Delay", StringValue (delay_t)); 
-  
+
   // We will use these NetDevice containers later, for IP addressing
   NetDeviceContainer ndacceso1 = csma_acceso1.Install (acceso1);  // Primera red de acceso
   NetDeviceContainer ndacceso2 = csma_acceso2.Install (acceso2);  // Segunda red de acceso
@@ -91,6 +101,35 @@ main ( int argc, char * argv[])
   // Popular tablas de routing
   Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
   
+  NS_LOG_INFO("Preparamos las trazas");
+  //Trazas///////////////////////////////////////////////////
+  NS_LOG_INFO("Router1");
+  //Router 1
+  //Ptr<NetDevice> nd_router0 = acceso1.Get (2)->GetDevice (1);
+ Ptr<NetDevice> nd_router0 = troncal.Get (0)->GetDevice (1); 
+ Ptr<PointToPointNetDevice> device_router0=nd_router0->GetObject<PointToPointNetDevice>();
+  NS_LOG_INFO("Router2");
+  //Router 2
+  //  Ptr<NetDevice> nd_router1 = acceso2.Get(2)->GetDevice(1);
+  Ptr<NetDevice> nd_router1 = troncal.Get(1)->GetDevice(1);
+
+  Ptr<PointToPointNetDevice> device_router1=nd_router1->GetObject<PointToPointNetDevice>();
+
+  //Instanciamos las trazas
+  NS_LOG_INFO("Instaciamos la clase trazas");
+  Trazas traza;
+  //Router1
+  device_router0->TraceConnectWithoutContext ("PhyTxEnd", MakeCallback (&Trazas::Router0Envia, &traza));
+  device_router0->TraceConnectWithoutContext ("PhyRxEnd", MakeCallback (&Trazas::Router0Recibe, &traza));
+  //Router2
+  device_router1->TraceConnectWithoutContext ("PhyTxEnd", MakeCallback (&Trazas::Router1Envia, &traza));
+  device_router1->TraceConnectWithoutContext ("PhyRxEnd", MakeCallback (&Trazas::Router1Recibe, &traza));
+
+  NS_LOG_INFO("Fin de trazas");
+  ///////////////////////////////////////////////////////////
+
+
+
   // Sumidero
   uint16_t port = 8421;
   PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port)));
@@ -107,13 +146,18 @@ main ( int argc, char * argv[])
   app.Start (Seconds (1.0));
   app.Stop (Seconds (10.0));
 
-  AsciiTraceHelper ascii;
-  // csma.EnableAsciiAll (ascii.CreateFileStream ("csma-prueba.tr"));
-  csma_acceso1.EnablePcapAll ("csma-acceso1", false);
-  csma_acceso2.EnablePcapAll ("csma-acceso2", false);
+  if(tracing)
+    {
+      AsciiTraceHelper ascii;
+      // csma.EnableAsciiAll (ascii.CreateFileStream ("csma-prueba.tr"));
+      csma_acceso1.EnablePcapAll ("csma-acceso1", false);
+      csma_acceso2.EnablePcapAll ("csma-acceso2", false);
+    }
+
 
   NS_LOG_INFO ("Run Simulation");
   Simulator::Run();
+  traza.ImprimeTrazas();
   Simulator::Destroy ();
   NS_LOG_INFO ("Done");
 }
