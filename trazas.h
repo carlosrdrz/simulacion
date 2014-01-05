@@ -27,6 +27,8 @@ public:
 
   virtual ~Trazas ();
 
+  void Monitorize (Ptr<NetDevice> r1, Ptr<NetDevice> r2);
+
   void Router0Recibe (Ptr<const Packet> paquete);
 
   int GetRouter0Recibe ();

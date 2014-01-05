@@ -53,6 +53,9 @@ main ( int argc, char * argv[])
   cmd.AddValue("Delay2",             "Retardo de la red de acceso 2",         delay_2);
   cmd.AddValue("Delayt",             "Retardo de la red troncal",             delay_t);
   cmd.Parse (argc, argv);
+
+  // Variables de trazas
+  Trazas traza;
  
   NodeContainer acceso1, acceso2, troncal;
   troncal.Create(2);
@@ -101,34 +104,14 @@ main ( int argc, char * argv[])
   // Popular tablas de routing
   Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
   
-  NS_LOG_INFO("Preparamos las trazas");
   //Trazas///////////////////////////////////////////////////
-  NS_LOG_INFO("Router1");
-  //Router 1
-  //Ptr<NetDevice> nd_router0 = acceso1.Get (2)->GetDevice (1);
- Ptr<NetDevice> nd_router0 = troncal.Get (0)->GetDevice (1); 
- Ptr<PointToPointNetDevice> device_router0=nd_router0->GetObject<PointToPointNetDevice>();
-  NS_LOG_INFO("Router2");
-  //Router 2
-  //  Ptr<NetDevice> nd_router1 = acceso2.Get(2)->GetDevice(1);
+  NS_LOG_INFO("Preparamos las trazas");
+  Ptr<NetDevice> nd_router0 = troncal.Get (0)->GetDevice (1); 
   Ptr<NetDevice> nd_router1 = troncal.Get(1)->GetDevice(1);
-
-  Ptr<PointToPointNetDevice> device_router1=nd_router1->GetObject<PointToPointNetDevice>();
-
-  //Instanciamos las trazas
   NS_LOG_INFO("Instaciamos la clase trazas");
-  Trazas traza;
-  //Router1
-  device_router0->TraceConnectWithoutContext ("PhyTxEnd", MakeCallback (&Trazas::Router0Envia, &traza));
-  device_router0->TraceConnectWithoutContext ("PhyRxEnd", MakeCallback (&Trazas::Router0Recibe, &traza));
-  //Router2
-  device_router1->TraceConnectWithoutContext ("PhyTxEnd", MakeCallback (&Trazas::Router1Envia, &traza));
-  device_router1->TraceConnectWithoutContext ("PhyRxEnd", MakeCallback (&Trazas::Router1Recibe, &traza));
-
+  traza.Monitorize (nd_router0, nd_router1);
   NS_LOG_INFO("Fin de trazas");
   ///////////////////////////////////////////////////////////
-
-
 
   // Sumidero
   uint16_t port = 8421;

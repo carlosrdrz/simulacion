@@ -17,12 +17,11 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("Trazas");
 
-
 Trazas::Trazas()
-  :  envia_0(0),
-     recibe_0(0),
-     envia_1(0),
-     recibe_1(0)
+  : envia_0(0),
+    recibe_0(0),
+    envia_1(0),
+    recibe_1(0)
 {
 }
 
@@ -30,6 +29,19 @@ Trazas::~Trazas()
 {
 }
 
+//Metodo para comenzar a monitorizar los routers
+void Trazas::Monitorize(Ptr<NetDevice> r1, Ptr<NetDevice> r2)
+{
+  Ptr<PointToPointNetDevice> device_router0 = r1->GetObject<PointToPointNetDevice>();
+  Ptr<PointToPointNetDevice> device_router1 = r2->GetObject<PointToPointNetDevice>();
+
+  //Router1
+  device_router0->TraceConnectWithoutContext ("PhyTxEnd", MakeCallback (&Trazas::Router0Envia, this));
+  device_router0->TraceConnectWithoutContext ("PhyRxEnd", MakeCallback (&Trazas::Router0Recibe, this));
+  //Router2
+  device_router1->TraceConnectWithoutContext ("PhyTxEnd", MakeCallback (&Trazas::Router1Envia, this));
+  device_router1->TraceConnectWithoutContext ("PhyRxEnd", MakeCallback (&Trazas::Router1Recibe, this));
+}
 
 //Métodos para el nodo dorsal de la izquierda 0
 //Método llamado en la traza de recepción que aumenta un contador
@@ -85,11 +97,11 @@ Trazas::GetRouter1Envia()
 void
 Trazas::ImprimeTrazas()
 {
-  std::cout<<"Trazas obtenidas: "<<std::endl;
-  std::cout<<"Paquetes enviados por el router 0: "<<envia_0<<std::endl;
-  std::cout<<"Paquetes recibidos por el router 0: "<<recibe_0<<std::endl;
-  std::cout<<"Paquetes enviados por el router 1: "<<envia_1<<std::endl;
-  std::cout<<"Paquetes recibidos por el router 1: "<<recibe_1<<std::endl;
+  std::cout << "Trazas obtenidas: " << std::endl;
+  std::cout << "Paquetes enviados por el router 0: " << envia_0 << std::endl;
+  std::cout << "Paquetes recibidos por el router 0: " << recibe_0 << std::endl;
+  std::cout << "Paquetes enviados por el router 1: " << envia_1 << std::endl;
+  std::cout << "Paquetes recibidos por el router 1: " << recibe_1 << std::endl;
 }
 
-//#endif
+//#endifPtr<NetDevice> r1, Ptr<NetDevice> r2
