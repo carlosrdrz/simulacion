@@ -104,4 +104,4 @@ Trazas::ImprimeTrazas()
   std::cout << "Paquetes recibidos por el router 1: " << recibe_1 << std::endl;
 }
 
-//#endifPtr<NetDevice> r1, Ptr<NetDevice> r2
+//#endif
