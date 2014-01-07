@@ -69,7 +69,7 @@ void TxCallback (Ptr<CounterCalculator<uint32_t> > datac,
 //-- main
 //----------------------------------------------
 int main (int argc, char *argv[]) {
-
+  
   double distance = 50.0;
   string format ("omnet");
 
@@ -133,38 +133,38 @@ int main (int argc, char *argv[]) {
   acceso2.Add(troncal.Get (1));
 
   NS_LOG_INFO ("Se crea el Wifi y ppp en red troncal");
-  WifiHelper wifi_acceso1, wifi_acceso2 = WifiHelper::Default ();
-  NqosWifiMacHelper wifiMac_acceso1, wifiMac_acceso2 = NqosWifiMacHelper::Default ();
+  WifiHelper wifi_acceso1 = WifiHelper::Default (); //, wifi_acceso2 = WifiHelper::Default ();
+  NqosWifiMacHelper wifiMac_acceso1 = NqosWifiMacHelper::Default (); //, wifiMac_acceso2 = NqosWifiMacHelper::Default ();
   wifiMac_acceso1.SetType ("ns3::AdhocWifiMac");
-  wifiMac_acceso2.SetType ("ns3::AdhocWifiMac");
-  YansWifiPhyHelper wifiPhy_acceso1, wifiPhy_acceso2 = YansWifiPhyHelper::Default ();
-  YansWifiChannelHelper wifiChannel_acceso1, wifiChannel_acceso2 = YansWifiChannelHelper::Default ();
+  //wifiMac_acceso2.SetType ("ns3::AdhocWifiMac");
+  YansWifiPhyHelper wifiPhy_acceso1 = YansWifiPhyHelper::Default (); // wifiPhy_acceso2 = YansWifiPhyHelper::Default ();
+  YansWifiChannelHelper wifiChannel_acceso1 = YansWifiChannelHelper::Default (); // wifiChannel_acceso2 = YansWifiChannelHelper::Default ();
   wifiPhy_acceso1.SetChannel (wifiChannel_acceso1.Create ());
-  wifiPhy_acceso2.SetChannel (wifiChannel_acceso2.Create ());
+  //wifiPhy_acceso2.SetChannel (wifiChannel_acceso2.Create ());
   // Red troncal
   PointToPointHelper point;
   point.SetDeviceAttribute ("DataRate", DataRateValue (DataRate (data_rate_t)));
   point.SetChannelAttribute ("Delay", StringValue (delay_t));
 
   NetDeviceContainer acceso1Devices = wifi_acceso1.Install (wifiPhy_acceso1, wifiMac_acceso1, acceso1);
-  NetDeviceContainer acceso2Devices = wifi_acceso2.Install (wifiPhy_acceso2, wifiMac_acceso2, acceso2);
+  //NetDeviceContainer acceso2Devices = wifi_acceso2.Install (wifiPhy_acceso2, wifiMac_acceso2, acceso2);
   NetDeviceContainer troncalDevices = point.Install (troncal); 
   
   NS_LOG_INFO ("Add IP Stack.");
   InternetStackHelper internet_acceso1;
   internet_acceso1.Install (acceso1);
-  InternetStackHelper internet_acceso2;
-  internet_acceso2.Install (acceso2);
+  //InternetStackHelper internet_acceso2;
+  //internet_acceso2.Install (acceso2);
 
   NS_LOG_INFO ("Add IP Addresses");
   Ipv4AddressHelper ipAddrs;
-  Ipv4InterfaceContainer icacceso1, icacceso2, ictroncal;
+  Ipv4InterfaceContainer icacceso1, /*icacceso2,*/ ictroncal;
   ipAddrs.SetBase ("10.1.1.0", "255.255.255.0");
   icacceso1 = ipAddrs.Assign (acceso1Devices);
-  ipAddrs.SetBase ("10.1.2.0", "255.255.255.0");
-  icacceso2 = ipAddrs.Assign (acceso2Devices);
-  ipAddrs.SetBase ("10.1.3.0", "255.255.255.0");
-  ictroncal = ipAddrs.Assign (troncalDevices);
+  /*ipAddrs.SetBase ("10.1.2.0", "255.255.255.0");
+  icacceso2 = ipAddrs.Assign (acceso2Devices);*/
+//  ipAddrs.SetBase ("10.1.3.0", "255.255.255.0");
+  //ictroncal = ipAddrs.Assign (troncalDevices);
   
   Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
@@ -176,16 +176,16 @@ int main (int argc, char *argv[]) {
   MobilityHelper mobility_acceso1, mobility_acceso2;
   Ptr<ListPositionAllocator> positionAlloc_acceso1 =
     CreateObject<ListPositionAllocator>();
-  Ptr<ListPositionAllocator> positionAlloc_acceso2 = 
-    CreateObject<ListPositionAllocator>();
+  //Ptr<ListPositionAllocator> positionAlloc_acceso2 = 
+   // CreateObject<ListPositionAllocator>();
   positionAlloc_acceso1->Add (Vector (0.0, 0.0, 0.0));
   positionAlloc_acceso1->Add (Vector (0.0, distance, 0.0));
-  positionAlloc_acceso2->Add (Vector (0.0, 0.0, 0.0));
-  positionAlloc_acceso2->Add (Vector (0.0, distance, 0.0));
+  //positionAlloc_acceso2->Add (Vector (0.0, 0.0, 0.0));
+  //positionAlloc_acceso2->Add (Vector (0.0, distance, 0.0));
   mobility_acceso1.SetPositionAllocator (positionAlloc_acceso1);
   mobility_acceso1.Install (acceso1);
-  mobility_acceso2.SetPositionAllocator (positionAlloc_acceso2);
-  mobility_acceso2.Install (acceso2);
+  //mobility_acceso2.SetPositionAllocator (positionAlloc_acceso2);
+  //mobility_acceso2.Install (acceso2);
 
 
 
@@ -279,8 +279,8 @@ int main (int argc, char *argv[]) {
 
 
 
-  /**
-   * Just to show this is here...
+  
+   /* Just to show this is here... */
    Ptr<MinMaxAvgTotalCalculator<uint32_t> > test = 
    CreateObject<MinMaxAvgTotalCalculator<uint32_t> >();
    test->SetKey("test-dc");
@@ -290,7 +290,6 @@ int main (int argc, char *argv[]) {
    test->Update(8);
    test->Update(24);
    test->Update(12);
-  **/
 
   // This DataCalculator connects directly to the transmit trace
   // provided by our Sender Application.  It records some basic
@@ -357,5 +356,6 @@ int main (int argc, char *argv[]) {
 
   // end main
 }
+
 
 #endif
