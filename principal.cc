@@ -10,6 +10,7 @@
 #include <string>
 #include <stdlib.h>
 #include <cassert>
+#include <math.h>
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/csma-module.h"
@@ -22,7 +23,9 @@
 #include "ns3/internet-module.h"
 #include "trazas.h"
 
-const double distance = 50.0;
+#define TASA_ERRORES 0.1
+
+
 
 using namespace ns3;
 
@@ -42,6 +45,7 @@ main ( int argc, char * argv[])
   unsigned nodos_acceso_1 = 2;
   unsigned nodos_acceso_2 = 2;
   unsigned nodos_wifi = 1;
+  double distance = 50.0;
   std::string data_rate_1   = "5Mbps";
   std::string data_rate_2   = "5Mbps";
   std::string data_rate_t   = "5Mbps";
@@ -71,10 +75,17 @@ main ( int argc, char * argv[])
   wifi.Create(nodos_wifi);
 
   NodeContainer total(acceso1, acceso2, troncal, wifi);
-  // añadimos nodos compartis (routers)
+  // añadimos nodos compartidos (routers)
   acceso1.Add(troncal.Get (0));
   acceso2.Add(troncal.Get (1));
   wifi.Add(troncal.Get(0));
+
+  //Modelo de errores
+  Ptr<RateErrorModel> error = CreateObject<RateErrorModel> ();
+  Ptr<UniformRandomVariable> uv = CreateObject<UniformRandomVariable> ();
+  error->SetRandomVariable (uv);
+  error->SetUnit(RateErrorModel::ERROR_UNIT_PACKET);
+  error->SetRate(TASA_ERRORES);
 
   NS_LOG_INFO ("Creando Topologia");
   // Redes de acceso
@@ -145,6 +156,14 @@ main ( int argc, char * argv[])
   NS_LOG_INFO("Fin de trazas");
   ///////////////////////////////////////////////////////////
 
+
+  //Para los errores////////////////////////////////////////
+  Ptr<PointToPointNetDevice> device_router0 = nd_router0->GetObject<PointToPointNetDevice> ();
+  Ptr<PointToPointNetDevice> device_router1 = nd_router1->GetObject<PointToPointNetDevice> ();
+  device_router0->SetReceiveErrorModel(error);
+  device_router1->SetReceiveErrorModel(error);
+  //////////////////////////////////////////////////////////
+
   // Sumidero
   uint16_t port = 8421;
   PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port)));
@@ -155,15 +174,15 @@ main ( int argc, char * argv[])
 
   // Aplicacion OnOff//////////////////////////////////////////
   //Preparamos el intervalo ON y OFF
-  Ptr<ConstantRandomVariable> varon = CreateObject<ConstantRandomVariable>();
+  /*Ptr<ConstantRandomVariable> varon = CreateObject<ConstantRandomVariable>();
   varon=SetAttribute("Constant", DoubleValue(0.15));
-  Ptr<ConnstantRandomVariable> varoff = CreateObject<ConstantRandomVariable>();
-  varoff=SetAttribute("Constant", DoubleValue(0.85));
+  Ptr<ConstantRandomVariable> varoff = CreateObject<ConstantRandomVariable>();
+  varoff=SetAttribute("Constant", DoubleValue(0.85));*/
   //Instanciamos la aplicación onoff y se configura
   OnOffHelper onoff ("ns3::UdpSocketFactory", Address (InetSocketAddress (icacceso2.GetAddress (1), port)));
   onoff.SetConstantRate (DataRate ("500kb/s"));
-  onoff.SetAttribute("OnTime", PointerValue(varon));
-  onoff.SetAttribute("OffTime", PointerValue(varoff));
+  //onoff.SetAttribute("OnTime", PointerValue(varon));
+  //onoff.SetAttribute("OffTime", PointerValue(varoff));
   //Se instala la aplicación onoff
   ApplicationContainer app = onoff.Install (wifi.Get (0));
   app.Start (Seconds (1.0));
