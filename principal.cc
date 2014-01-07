@@ -174,10 +174,10 @@ main ( int argc, char * argv[])
 
   // Aplicacion OnOff//////////////////////////////////////////
   //Preparamos el intervalo ON y OFF
-  /*Ptr<ConstantRandomVariable> varon = CreateObject<ConstantRandomVariable>();
-  varon=SetAttribute("Constant", DoubleValue(0.15));
-  Ptr<ConstantRandomVariable> varoff = CreateObject<ConstantRandomVariable>();
-  varoff=SetAttribute("Constant", DoubleValue(0.85));*/
+  //Ptr<ConstantRandomVariable> varon = CreateObject<ConstantRandomVariable>();
+  //varon->SetAttribute("Constant", DoubleValue(0.15));
+  //Ptr<ConstantRandomVariable> varoff = CreateObject<ConstantRandomVariable>();
+  //varoff->SetAttribute("Constant", DoubleValue(0.85)); 
   //Instanciamos la aplicación onoff y se configura
   OnOffHelper onoff ("ns3::UdpSocketFactory", Address (InetSocketAddress (icacceso2.GetAddress (1), port)));
   onoff.SetConstantRate (DataRate ("500kb/s"));
