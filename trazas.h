@@ -18,42 +18,56 @@ using namespace ns3;
 #include "ns3/callback.h"
 #include "ns3/internet-module.h"
 
+using namespace std;
 
 class Trazas
 {
+
 public:
 
-  Trazas ();
+  ~Trazas ();
 
-  virtual ~Trazas ();
+  void Monitorize (int id, Ptr<NetDevice> r);
 
-  void Monitorize (Ptr<NetDevice> r1, Ptr<NetDevice> r2);
+  int GetPaquetesEnviados (int id);
 
-  void Router0Recibe (Ptr<const Packet> paquete);
+  int GetPaquetesRecibidos (int id);
 
-  int GetRouter0Recibe ();
+  float GetBytesEnviados (int id);
 
-  void Router0Envia (Ptr<const Packet> paquete);
+  float GetBytesRecibidos (int id);
 
-  int GetRouter0Envia ();
+  void DispositivoRecibe (int id, Ptr<const Packet> paquete);
 
-  void Router1Recibe (Ptr<const Packet> paquete);
-
-  int GetRouter1Recibe ();
-
-  void Router1Envia (Ptr<const Packet> paquete);
-
-  int GetRouter1Envia ();
+  void DispositivoEnvia (int id, Ptr<const Packet> paquete);
   
   void ImprimeTrazas ();
 
-
 private:
-  //Variable que cuenta los paquetes cuyo envío ha finalizado.
-  int envia_0;
-  int recibe_0;
-  int envia_1;
-  int recibe_1;
+
+  class Datos {
+  public:
+    int paquetesEnviados;
+    int paquetesRecibidos;
+    float bytesEnviados;
+    float bytesRecibidos;
+
+    // Método llamado en la traza de envío que aumenta un contador
+    void DispositivoEnvia(Ptr<const Packet> paquete)
+    {
+      paquetesEnviados++;
+      bytesEnviados += paquete->GetSize();
+    }
+
+    // Método llamado en la traza de recepción que aumenta un contador
+    void DispositivoRecibe(Ptr<const Packet> paquete)
+    {
+      paquetesRecibidos++;
+      bytesRecibidos += paquete->GetSize();
+    }
+  };
+
+  std::map<int, Datos*> valores;
 
 };
 
