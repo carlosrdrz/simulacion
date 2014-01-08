@@ -45,7 +45,7 @@ public:
 
 private:
 
-  class Datos;
+  class Datos; /* FW */
 
   std::map<std::string, Datos*> valores;
 
