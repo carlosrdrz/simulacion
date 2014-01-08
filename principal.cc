@@ -151,8 +151,8 @@ main ( int argc, char * argv[])
   Ptr<NetDevice> nd_router0 = troncal.Get (0)->GetDevice (1); 
   Ptr<NetDevice> nd_router1 = troncal.Get (1)->GetDevice (1);
   NS_LOG_INFO("Monitorizamos los dos routers");
-  traza.Monitorize (0, nd_router0);
-  traza.Monitorize (1, nd_router1);
+  traza.Monitorize ("r0", nd_router0);
+  traza.Monitorize ("r1", nd_router1);
   NS_LOG_INFO("Fin de trazas");
   ///////////////////////////////////////////////////////////
 
