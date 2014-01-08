@@ -1,0 +1,29 @@
+                                Proyecto de Simulación
+
+1. Estructura de la red
+========================
+
+Se pretende crear la siguiente estructura:
+
+|   cacceso1    |           | cacceso2  |
+
+=================           =============
+|       |       |           |     |     |
+c1n0   c1n1    (r0) ====== (r1)  c2n0   c2n1 ...
+
+Donde c0 y c1 son instancias de ns3::NodeContainer, y representan, respectivamente, a la red de
+una empresa y a internet. Cada red puede contener tantos nodos como se desee. Para unir dichas
+redes, tenemos los routers r0 y r1. 
+
+Desde la empresa se accederán a varios servicios de internet (Navegación web, descarga de archivos,
+servicios VoIP). Por su parte, desde internet se accederá también a servicios internos de la 
+empresa (simulando accesos de empleados trabajando desde casa, llamadas...)
+
+2. Implementaciones
+===================
+
+2.1 Trazas
+----------
+La simulación dispone de una clase "Trazas", en las que se registran los dispositivos de red del
+que se quieren obtener estadísticas. Tras registrarse en una instancia de la misma 
+(Trazas::Monitorize), se pueden obtener los paquetes y bytes recibidos y enviados.
