@@ -174,15 +174,15 @@ main ( int argc, char * argv[])
 
   // Aplicacion OnOff//////////////////////////////////////////
   //Preparamos el intervalo ON y OFF
-  //Ptr<ConstantRandomVariable> varon = CreateObject<ConstantRandomVariable>();
-  //varon->SetAttribute("Constant", DoubleValue(0.15));
-  //Ptr<ConstantRandomVariable> varoff = CreateObject<ConstantRandomVariable>();
-  //varoff->SetAttribute("Constant", DoubleValue(0.85)); 
+  Ptr<ConstantRandomVariable> varon = CreateObject<ConstantRandomVariable>();
+  varon->SetAttribute("Constant", DoubleValue(0.2));
+  Ptr<ConstantRandomVariable> varoff = CreateObject<ConstantRandomVariable>();
+  varoff->SetAttribute("Constant", DoubleValue(0.8)); 
   //Instanciamos la aplicación onoff y se configura
   OnOffHelper onoff ("ns3::UdpSocketFactory", Address (InetSocketAddress (icacceso2.GetAddress (1), port)));
   onoff.SetConstantRate (DataRate ("500kb/s"));
-  //onoff.SetAttribute("OnTime", PointerValue(varon));
-  //onoff.SetAttribute("OffTime", PointerValue(varoff));
+  onoff.SetAttribute("OnTime", PointerValue(varon));
+  onoff.SetAttribute("OffTime", PointerValue(varoff));
   //Se instala la aplicación onoff
   ApplicationContainer app = onoff.Install (wifi.Get (0));
   app.Start (Seconds (1.0));
