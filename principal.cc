@@ -22,10 +22,9 @@
 #include "ns3/callback.h"
 #include "ns3/internet-module.h"
 #include "trazas.h"
+#include "navegador.h"
 
 #define TASA_ERRORES 0.1
-
-
 
 using namespace ns3;
 
@@ -174,17 +173,19 @@ main ( int argc, char * argv[])
 
   // Aplicacion OnOff//////////////////////////////////////////
   //Preparamos el intervalo ON y OFF
-  Ptr<ConstantRandomVariable> varon = CreateObject<ConstantRandomVariable>();
-  varon->SetAttribute("Constant", DoubleValue(0.2));
-  Ptr<ConstantRandomVariable> varoff = CreateObject<ConstantRandomVariable>();
-  varoff->SetAttribute("Constant", DoubleValue(0.8)); 
+  //Ptr<ConstantRandomVariable> varon = CreateObject<ConstantRandomVariable>();
+  //varon->SetAttribute("Constant", DoubleValue(0.2));
+  //Ptr<ConstantRandomVariable> varoff = CreateObject<ConstantRandomVariable>();
+  //varoff->SetAttribute("Constant", DoubleValue(0.8)); 
   //Instanciamos la aplicación onoff y se configura
-  OnOffHelper onoff ("ns3::UdpSocketFactory", Address (InetSocketAddress (icacceso2.GetAddress (1), port)));
-  onoff.SetConstantRate (DataRate ("500kb/s"));
-  onoff.SetAttribute("OnTime", PointerValue(varon));
-  onoff.SetAttribute("OffTime", PointerValue(varoff));
+  //OnOffHelper onoff ("ns3::UdpSocketFactory", Address (InetSocketAddress (icacceso2.GetAddress (1), port)));
+  //onoff.SetConstantRate (DataRate ("500kb/s"));
+  //onoff.SetAttribute("OnTime", PointerValue(varon));
+  //onoff.SetAttribute("OffTime", PointerValue(varoff));
+  // "EL NAVEGADOR"
+  NavegadorHelper chrome (0.4,0.6, icacceso2.GetAddress(1), port);
   //Se instala la aplicación onoff
-  ApplicationContainer app = onoff.Install (wifi.Get (0));
+  ApplicationContainer app = chrome.Install (wifi.Get (0));
   app.Start (Seconds (1.0));
   app.Stop (Seconds (10.0));
   /////////////////////////////////////////////////////////////
