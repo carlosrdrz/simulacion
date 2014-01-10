@@ -23,6 +23,7 @@
 #include "ns3/internet-module.h"
 #include "trazas.h"
 #include "navegador.h"
+#include "transferencia.h"
 
 #define TASA_ERRORES 0.1
 
@@ -42,7 +43,7 @@ main ( int argc, char * argv[])
 
   bool tracing=true;
   unsigned nodos_acceso_1 = 2;
-  unsigned nodos_acceso_2 = 2;
+  unsigned nodos_acceso_2 = 3;
   unsigned nodos_wifi = 1;
   double distance = 50.0;
   std::string data_rate_1   = "5Mbps";
@@ -165,11 +166,16 @@ main ( int argc, char * argv[])
 
   // Sumidero
   uint16_t port = 8421;
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port)));
+  PacketSinkHelper sinkTcp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port)));
+  PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port)));
   
-  ApplicationContainer sinkC = sink.Install (acceso2.Get (1)); // Node n4
-  sinkC.Start (Seconds (1.0));
-  sinkC.Stop (Seconds (10.0));
+  ApplicationContainer sink1 = sinkTcp.Install (acceso2.Get (1)); // Node n4
+  sink1.Start (Seconds (1.0));
+  sink1.Stop (Seconds (10.0));
+
+  ApplicationContainer sink2 = sinkUdp.Install (acceso2.Get (1)); 
+  sink2.Start (Seconds (1.0));
+  sink2.Stop (Seconds (10.0));
 
   // Aplicacion OnOff//////////////////////////////////////////
   //Preparamos el intervalo ON y OFF
@@ -182,13 +188,22 @@ main ( int argc, char * argv[])
   //onoff.SetConstantRate (DataRate ("500kb/s"));
   //onoff.SetAttribute("OnTime", PointerValue(varon));
   //onoff.SetAttribute("OffTime", PointerValue(varoff));
-  // "EL NAVEGADOR"
-  NavegadorHelper chrome (0.4,0.6, icacceso2.GetAddress(1), port);
-  //Se instala la aplicación onoff
-  ApplicationContainer app = chrome.Install (wifi.Get (0));
-  app.Start (Seconds (1.0));
-  app.Stop (Seconds (10.0));
+  //Navegador//////////////////////////////////////////////////
+  NavegadorHelper chrome (icacceso2.GetAddress(1), port);
+  //Se instala la aplicación navegador
+  ApplicationContainer navegador = chrome.Install (acceso1.Get(0));
+  navegador.Start (Seconds (1.0));
+  navegador.Stop (Seconds (10.0));
   /////////////////////////////////////////////////////////////
+   
+  //Transferencia fichero//////////////////////////////////////
+  //TransferenciaHelper ftp (icacceso2.GetAddress(1), port);
+  //Se instala la aplicación transferencia
+  //ApplicationContainer transferencia = ftp.Install (acceso1.Get(0));
+  //transferencia.Start (Seconds(1.0));
+  //transferencia.Stop (Seconds(10.0));
+  //////////////////////////////////////////////////////////////
+
   if(tracing)
     {
       AsciiTraceHelper ascii;

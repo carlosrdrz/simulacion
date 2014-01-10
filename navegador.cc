@@ -18,14 +18,18 @@
 #include "navegador.h"
 using namespace ns3;
 
+#define ONTIMENAV 0.4
+#define OFFTIMENAV 0.6
+
 //antiguamente: const char *address
-NavegadorHelper::NavegadorHelper(double ton, double toff, Ipv4Address address, uint16_t port)
-  :OnOffHelper("ns3::UdpSocketFactory", Address (InetSocketAddress (address,port)))
+//NavegadorHelper::NavegadorHelper(double ton, double toff, Ipv4Address address, uint16_t port)
+NavegadorHelper::NavegadorHelper(Ipv4Address address, uint16_t port)
+  :OnOffHelper("ns3::TcpSocketFactory", Address (InetSocketAddress (address,port)))
 {
   varon=CreateObject<ConstantRandomVariable>();
   varoff=CreateObject<ConstantRandomVariable>();
-  varon->SetAttribute("Constant", DoubleValue(ton));
-  varoff->SetAttribute("Constant", DoubleValue(toff));
+  varon->SetAttribute("Constant", DoubleValue(ONTIMENAV));
+  varoff->SetAttribute("Constant", DoubleValue(OFFTIMENAV));
   //Probar con this->
   SetConstantRate (DataRate ("500kb/s"));
   SetAttribute("OnTime", PointerValue(varon));
