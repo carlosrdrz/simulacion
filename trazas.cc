@@ -5,12 +5,6 @@
   del envío de paquetes.
 */
 
-#include "ns3/applications-module.h"
-#include "ns3/core-module.h"
-#include "ns3/internet-module.h"
-#include <iostream>
-#include <fstream>
-#include <stdlib.h>
 #include "trazas.h"
 
 using namespace ns3;

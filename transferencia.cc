@@ -1,8 +1,3 @@
-/*
-  Fichero: navegador.h
-  Descripción: librería de la clase Navegador
-  que hereda de OnOffHelper
-*/
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -16,18 +11,18 @@
 #include "ns3/point-to-point-module.h"
 #include "ns3/callback.h"
 #include "ns3/internet-module.h"
-
+#include "transferencia.h"
 
 using namespace ns3;
 
-class NavegadorHelper : public OnOffHelper
+TransferenciaHelper::TransferenciaHelper(Ipv4Address address, uint16_t port)
+  : BulkSendHelper("ns3::TcpSocketFactory", Address(InetSocketAddress (address,port)))
 {
-public:
-  NavegadorHelper (double ton, double toff,Ipv4Address address, uint16_t port);
-  ~NavegadorHelper ();
+  maxBytes = 1000;
+  SetAttribute("MaxBytes", UintegerValue(maxBytes));
+}
 
-private:
-  Ptr<ConstantRandomVariable> varon;
-  Ptr<ConstantRandomVariable> varoff;
+TransferenciaHelper::~TransferenciaHelper()
+{
 
-};
+}

@@ -1,8 +1,3 @@
-/*
-  Fichero: navegador.h
-  Descripción: librería de la clase Navegador
-  que hereda de OnOffHelper
-*/
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -17,17 +12,15 @@
 #include "ns3/callback.h"
 #include "ns3/internet-module.h"
 
-
 using namespace ns3;
 
-class NavegadorHelper : public OnOffHelper
+class TransferenciaHelper : public BulkSendHelper
 {
 public:
-	
-  NavegadorHelper (Ipv4Address address, uint16_t port);
-  ~NavegadorHelper ();
+  TransferenciaHelper (Ipv4Address address, uint16_t port);
+  ~TransferenciaHelper ();
 
 private:
-  Ptr<ConstantRandomVariable> varon;
-  Ptr<ConstantRandomVariable> varoff;
+  uint32_t maxBytes;
+
 };
