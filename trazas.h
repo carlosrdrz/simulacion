@@ -32,14 +32,20 @@ public:
   int GetPaquetesEnviados (std::string id)const;
 
   int GetPaquetesRecibidos (std::string id)const;
+  
+  int GetPaquetesPerdidos (std::string id)const;
 
   int GetBytesEnviados (std::string id)const;
 
   int GetBytesRecibidos (std::string id)const;
+  
+  int GetBytesPerdidos (std::string id)const;
 
   void DispositivoRecibe (std::string id, Ptr<const Packet> paquete);
 
   void DispositivoEnvia (std::string id, Ptr<const Packet> paquete);
+
+  void DispositivoPierde (std::string id, Ptr<const Packet> paquete);
   
   void ImprimeTrazas ();
 
@@ -53,8 +59,10 @@ private:
   public:
     int paquetesEnviados;
     int paquetesRecibidos;
+    int paquetesPerdidos;
     int bytesEnviados;
     int bytesRecibidos;
+    int bytesPerdidos;
 
     // Método llamado en la traza de envío que aumenta un contador
     void DispositivoEnvia(Ptr<const Packet> paquete)
@@ -68,6 +76,13 @@ private:
     {
       paquetesRecibidos++;
       bytesRecibidos += paquete->GetSize();
+    }
+    
+    //Método llamado en la traza de paquetes perdidos que aumenta un cont.
+    void DispositivoPierde(Ptr<const Packet> paquete)
+    {
+      paquetesPerdidos++;
+      bytesPerdidos += paquete->GetSize();
     }
   };
 
