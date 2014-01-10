@@ -24,8 +24,10 @@
 #include "trazas.h"
 #include "navegador.h"
 #include "transferencia.h"
+#include "voip.h"
 
-#define TASA_ERRORES 0.1
+
+#define TASA_ERRORES 0.01
 
 using namespace ns3;
 
@@ -42,8 +44,8 @@ main ( int argc, char * argv[])
   Config::SetDefault ("ns3::CsmaNetDevice::EncapsulationMode", StringValue ("Dix"));
 
   bool tracing=true;
-  unsigned nodos_acceso_1 = 2;
-  unsigned nodos_acceso_2 = 3;
+  unsigned nodos_acceso_1 = 1;
+  unsigned nodos_acceso_2 = 1;
   unsigned nodos_wifi = 1;
   double distance = 50.0;
   std::string data_rate_1   = "5Mbps";
@@ -169,31 +171,26 @@ main ( int argc, char * argv[])
   PacketSinkHelper sinkTcp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port)));
   PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port)));
   
-  ApplicationContainer sink1 = sinkTcp.Install (acceso2.Get (1)); // Node n4
+  ApplicationContainer sink1 = sinkTcp.Install (acceso2.Get (0)); // Node n4
   sink1.Start (Seconds (1.0));
   sink1.Stop (Seconds (10.0));
 
-  ApplicationContainer sink2 = sinkUdp.Install (acceso2.Get (1)); 
+  ApplicationContainer sink2 = sinkUdp.Install (acceso2.Get (0)); 
   sink2.Start (Seconds (1.0));
   sink2.Stop (Seconds (10.0));
 
-  // Aplicacion OnOff//////////////////////////////////////////
-  //Preparamos el intervalo ON y OFF
-  //Ptr<ConstantRandomVariable> varon = CreateObject<ConstantRandomVariable>();
-  //varon->SetAttribute("Constant", DoubleValue(0.2));
-  //Ptr<ConstantRandomVariable> varoff = CreateObject<ConstantRandomVariable>();
-  //varoff->SetAttribute("Constant", DoubleValue(0.8)); 
-  //Instanciamos la aplicación onoff y se configura
-  //OnOffHelper onoff ("ns3::UdpSocketFactory", Address (InetSocketAddress (icacceso2.GetAddress (1), port)));
-  //onoff.SetConstantRate (DataRate ("500kb/s"));
-  //onoff.SetAttribute("OnTime", PointerValue(varon));
-  //onoff.SetAttribute("OffTime", PointerValue(varoff));
   //Navegador//////////////////////////////////////////////////
-  NavegadorHelper chrome (icacceso2.GetAddress(1), port);
+  NavegadorHelper chrome (icacceso2.GetAddress(0), port);
   //Se instala la aplicación navegador
   ApplicationContainer navegador = chrome.Install (acceso1.Get(0));
   navegador.Start (Seconds (1.0));
   navegador.Stop (Seconds (10.0));
+  
+  // Telefono IP///////////////////////////////////////////////
+  VoipHelper ciscoPhone (icacceso2. GetAddress(0), port);
+  ApplicationContainer app_voip = ciscoPhone.Install (acceso1.Get (0));
+  app_voip.Start (Seconds (1.0));
+  app_voip.Stop (Seconds (10.0));
   /////////////////////////////////////////////////////////////
    
   //Transferencia fichero//////////////////////////////////////

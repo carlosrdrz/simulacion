@@ -1,6 +1,7 @@
 /*
-  Fichero: navegador.cc
+  Fichero: voip.cc
   Clase que hereda de OnOffApplication
+  Emula llamadas sobre VoIP
 */
 #include <iostream>
 #include <fstream>
@@ -15,28 +16,33 @@
 #include "ns3/point-to-point-module.h"
 #include "ns3/callback.h"
 #include "ns3/internet-module.h"
-#include "navegador.h"
+#include "voip.h"
 using namespace ns3;
-
-#define ONTIMENAV 0.4
-#define OFFTIMENAV 0.6
-
-//antiguamente: const char *address
-NavegadorHelper::NavegadorHelper(Ipv4Address address, uint16_t port)
-  :OnOffHelper("ns3::TcpSocketFactory", Address (InetSocketAddress (address,port)))
+#define ONTIMEVOIP 0.6
+#define OFFTIMEVOIP 0.2
+/*
+  Constructor de la clase Voip.
+  Hereda el constructor de OnOffHelper
+  Configura la aplicación estableciendo
+  una tasa y OnTime, OffTime
+  SOBRE UDP
+*/
+VoipHelper::VoipHelper(Ipv4Address address, uint16_t port)
+  :OnOffHelper("ns3::UdpSocketFactory", Address (InetSocketAddress (address,port)))
 {
+  //Creamos las variables aleatorias para fijar On/Off Time
   varon=CreateObject<ConstantRandomVariable>();
   varoff=CreateObject<ConstantRandomVariable>();
-  varon->SetAttribute("Constant", DoubleValue(ONTIMENAV));
-  varoff->SetAttribute("Constant", DoubleValue(OFFTIMENAV));
-  //Probar con this->
+  varon->SetAttribute("Constant", DoubleValue(ONTIMEVOIP));
+  varoff->SetAttribute("Constant", DoubleValue(OFFTIMEVOIP));
+  //Configuramos la aplicación OnOff
   SetConstantRate (DataRate ("500kb/s"));
   SetAttribute("OnTime", PointerValue(varon));
   SetAttribute("OffTime", PointerValue(varoff));
   
 
 }
-NavegadorHelper::~NavegadorHelper()
+VoipHelper::~VoipHelper()
 {
 
 }
