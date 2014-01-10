@@ -14,42 +14,42 @@ NS_LOG_COMPONENT_DEFINE ("Trazas");
 Trazas::~Trazas()
 {
   std::cout << "Destructor trazas" << std::endl;
-  for (std::map<int,Datos*>::iterator it=valores.begin(); it!=valores.end(); ++it) {
+  for (std::map<std::string,Datos*>::iterator it=valores.begin(); it!=valores.end(); ++it) {
     delete it->second;
   }
   valores.clear();
 }
 
 //Metodo para comenzar a monitorizar los routers
-void Trazas::Monitorize(int id, Ptr<NetDevice> r)
+void Trazas::Monitorize(std::string id, Ptr<NetDevice> r)
 {
   Datos * datos_disp = new Datos();
   Ptr<PointToPointNetDevice> device = r->GetObject<PointToPointNetDevice>();
   device->TraceConnectWithoutContext ("PhyTxEnd", MakeCallback (&Datos::DispositivoEnvia, datos_disp));
   device->TraceConnectWithoutContext ("PhyRxEnd", MakeCallback (&Datos::DispositivoRecibe, datos_disp));
-  valores.insert(std::pair<int, Datos*>(id, datos_disp));
+  valores.insert(std::pair<std::string, Datos*>(id, datos_disp));
 }
 //Método que devuelve el contador de paquetes enviados
 int
-Trazas::GetPaquetesEnviados(int id)
+Trazas::GetPaquetesEnviados(std::string id)const
 {
   return valores.at(id)->paquetesEnviados;
 }
 //Método que devuelve el contador de paquetes recibidos
 int
-Trazas::GetPaquetesRecibidos(int id)
+Trazas::GetPaquetesRecibidos(std::string id)const
 {
   return valores.at(id)->paquetesRecibidos;
 }
 //Método que devuelve el contador de bytes enviados
-float
-Trazas::GetBytesEnviados(int id)
+int
+Trazas::GetBytesEnviados(std::string id)const
 {
   return valores.at(id)->bytesEnviados;
 }
 //Método que devuelve el contador de bytes recibidos. 
-float
-Trazas::GetBytesRecibidos(int id)
+int
+Trazas::GetBytesRecibidos(std::string id)const
 {
   return valores.at(id)->bytesRecibidos;
 }
@@ -57,8 +57,8 @@ void
 Trazas::ImprimeTrazas()
 {
   std::cout << "Trazas obtenidas: " << std::endl;
-  for (std::map<int,Datos*>::iterator it=valores.begin(); it!=valores.end(); ++it) {
-    int id = it->first;
+  for (std::map<std::string,Datos*>::const_iterator it=valores.begin(); it!=valores.end(); ++it) {
+    const std::string id = it->first;
     std::cout << "Paquetes enviados por el dispositivo " << id << ": " << GetPaquetesEnviados(id) << std::endl;
     std::cout << "Paquetes recibidos por el dispositivo " << id << ": " << GetPaquetesRecibidos(id) << std::endl;
     std::cout << "Bytes enviados por el dispositivo " << id << ": " << GetBytesEnviados(id) << std::endl;

@@ -28,30 +28,34 @@ public:
 
   ~Trazas ();
 
-  void Monitorize (int id, Ptr<NetDevice> r);
+  void Monitorize (std::string id, Ptr<NetDevice> r);
 
-  int GetPaquetesEnviados (int id);
+  int GetPaquetesEnviados (std::string id)const;
 
-  int GetPaquetesRecibidos (int id);
+  int GetPaquetesRecibidos (std::string id)const;
 
-  float GetBytesEnviados (int id);
+  int GetBytesEnviados (std::string id)const;
 
-  float GetBytesRecibidos (int id);
+  int GetBytesRecibidos (std::string id)const;
 
-  void DispositivoRecibe (int id, Ptr<const Packet> paquete);
+  void DispositivoRecibe (std::string id, Ptr<const Packet> paquete);
 
-  void DispositivoEnvia (int id, Ptr<const Packet> paquete);
+  void DispositivoEnvia (std::string id, Ptr<const Packet> paquete);
   
   void ImprimeTrazas ();
 
 private:
 
-  class Datos {
+  class Datos; /* FW */
+
+  std::map<std::string, Datos*> valores;
+
+  class Datos{
   public:
     int paquetesEnviados;
     int paquetesRecibidos;
-    float bytesEnviados;
-    float bytesRecibidos;
+    int bytesEnviados;
+    int bytesRecibidos;
 
     // Método llamado en la traza de envío que aumenta un contador
     void DispositivoEnvia(Ptr<const Packet> paquete)
@@ -67,8 +71,6 @@ private:
       bytesRecibidos += paquete->GetSize();
     }
   };
-
-  std::map<int, Datos*> valores;
 
 };
 

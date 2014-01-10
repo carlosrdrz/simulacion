@@ -8,6 +8,9 @@
 #include <iostream>
 #include "trazas.h"
 #include "topologia.h"
+#include "navegador.h"
+#include "transferencia.h"
+#include "voip.h"
 
 using namespace ns3;
 
@@ -93,33 +96,47 @@ main ( int argc, char * argv[])
   
   // Añadimos las trazas a los routers de la troncal
   NS_LOG_INFO("Monitorizamos los dos routers");
-  traza.Monitorize (0, topologia.GetNetDeviceContainer("troncal")->Get (0));
-  traza.Monitorize (1, topologia.GetNetDeviceContainer("troncal")->Get (1));
+  traza.Monitorize ("r0", topologia.GetNetDeviceContainer("troncal")->Get (0));
+  traza.Monitorize ("r1", topologia.GetNetDeviceContainer("troncal")->Get (1));
 
   // Añadimos los modelos de errores
   topologia.SetErrorModel("troncal", 0.1);
 
   // Comenzamos a añadir aplicaciones...
-  // Sumidero
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
+  // Sumideros
+  PacketSinkHelper sinkTcp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
+  PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
   
-  // Se instala la aplicación sink
-  ApplicationContainer sinkC = sink.Install (topologia.GetNodeContainer("acceso2")->Get (1));
-  sinkC.Start (Seconds (1.0));
-  sinkC.Stop (Seconds (10.0));
+  ApplicationContainer sink1 = sinkTcp.Install (topologia.GetNodeContainer("acceso2")->Get (0));
+  sink1.Start (Seconds (1.0));
+  sink1.Stop (Seconds (10.0));
 
-  // Aplicacion OnOff
-  OnOffHelper onoff ("ns3::UdpSocketFactory", Address (InetSocketAddress (topologia.GetInterfaceContainer("acceso2")->GetAddress (1), sink_port)));
-  onoff.SetConstantRate (DataRate ("500kb/s"));
-  // onoff.SetAttribute("OnTime", PointerValue(varon));
-  // onoff.SetAttribute("OffTime", PointerValue(varoff));
+  ApplicationContainer sink2 = sinkUdp.Install (topologia.GetNodeContainer("acceso2")->Get (0)); 
+  sink2.Start (Seconds (1.0));
+  sink2.Stop (Seconds (10.0));
 
-  // Se instala la aplicación onoff
-  ApplicationContainer app = onoff.Install (topologia.GetNodeContainer("wifi")->Get (0));
-  app.Start (Seconds (1.0));
-  app.Stop (Seconds (10.0));
+  // Navegador
+  NavegadorHelper chrome (topologia.GetInterfaceContainer("acceso2")->GetAddress (1), sink_port);
+  // Se instala la aplicación navegador
+  ApplicationContainer navegador = chrome.Install (topologia.GetNodeContainer("acceso1")->Get (0));
+  navegador.Start (Seconds (1.0));
+  navegador.Stop (Seconds (10.0));
+  
+  // Telefono IP
+  VoipHelper ciscoPhone (topologia.GetInterfaceContainer("acceso2")->GetAddress (0), sink_port);
+  ApplicationContainer app_voip = ciscoPhone.Install (topologia.GetNodeContainer("acceso1")->Get (0));
+  // Se instala la aplicacion Voip
+  app_voip.Start (Seconds (1.0));
+  app_voip.Stop (Seconds (10.0));
+   
+  // Transferencia fichero
+  TransferenciaHelper ftp (topologia.GetInterfaceContainer("acceso2")->GetAddress (1), sink_port);
+  // Se instala la aplicación transferencia
+  ApplicationContainer transferencia = ftp.Install (topologia.GetNodeContainer("acceso1")->Get (0));
+  transferencia.Start (Seconds(1.0));
+  transferencia.Stop (Seconds(10.0));
 
-  // Habilitar PCAPs
+  // Activamos la creacion de archivos PCAPs
   if(tracing) {
     topologia.EnablePCAPLogging ("acceso1");
     topologia.EnablePCAPLogging ("acceso2");
