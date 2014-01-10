@@ -19,11 +19,27 @@ Desde la empresa se accederán a varios servicios de internet (Navegación web, 
 servicios VoIP). Por su parte, desde internet se accederá también a servicios internos de la 
 empresa (simulando accesos de empleados trabajando desde casa, llamadas...)
 
-2. Implementaciones
-===================
+2. Clases auxiliares
+====================
 
 2.1 Trazas
 ----------
 La simulación dispone de una clase "Trazas", en las que se registran los dispositivos de red del
 que se quieren obtener estadísticas. Tras registrarse en una instancia de la misma 
 (Trazas::Monitorize), se pueden obtener los paquetes y bytes recibidos y enviados.
+
+2.2 Topología
+-------------
+La clase topología se encarga de crear un conjunto de redes interconectadas. Permite asignar a 
+a cada una de ellas características individuales:
+ * Modelo de errores
+ * Velocidad y retraso
+ * Aplicaciones en cada nodo.
+
+2.3 Aplicaciones
+----------------
+Se han creado, partiendo de la aplicación on/off suministrada por ns3, los siguientes aplicaciones
+* Navegador web
+* Trasferencia de ficheros
+* VoIP
+* Video de difusión
