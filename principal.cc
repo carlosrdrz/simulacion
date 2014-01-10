@@ -6,28 +6,11 @@
 */
 
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <stdlib.h>
-#include <cassert>
-#include <math.h>
-#include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/csma-module.h"
-#include "ns3/applications-module.h"
-#include "ns3/internet-module.h"
-#include "ns3/point-to-point-module.h"
-#include "ns3/wifi-module.h"
-#include "ns3/mobility-module.h"
-#include "ns3/callback.h"
-#include "ns3/internet-module.h"
 #include "trazas.h"
+#include "topologia.h"
 #include "navegador.h"
 #include "transferencia.h"
 #include "voip.h"
-
-
-#define TASA_ERRORES 0.01
 
 using namespace ns3;
 
@@ -36,18 +19,18 @@ NS_LOG_COMPONENT_DEFINE ("CsmaMulticastExample");
 int
 main ( int argc, char * argv[])
 {
-  ///////LOG//////////////////////
+  /////// LOG //////////////////////
   LogComponentEnable("Trazas", LOG_LEVEL_INFO);
   LogComponentEnable("CsmaMulticastExample", LOG_LEVEL_INFO);
-  //LogComponentEnable("Trazas", LOG_LEVEL_ALL);
+  // LogComponentEnable("Trazas", LOG_LEVEL_ALL);
 
   Config::SetDefault ("ns3::CsmaNetDevice::EncapsulationMode", StringValue ("Dix"));
 
-  bool tracing=true;
-  unsigned nodos_acceso_1 = 1;
-  unsigned nodos_acceso_2 = 1;
-  unsigned nodos_wifi = 1;
-  double distance = 50.0;
+  bool tracing              = true;
+  unsigned nodos_acceso_1   = 2;
+  unsigned nodos_acceso_2   = 2;
+  unsigned nodos_wifi       = 1;
+  double distance           = 50.0;
   std::string data_rate_1   = "5Mbps";
   std::string data_rate_2   = "5Mbps";
   std::string data_rate_t   = "5Mbps";
@@ -55,7 +38,10 @@ main ( int argc, char * argv[])
   std::string delay_2       = "0.002";
   std::string delay_t       = "0.002";
 
-  CommandLine cmd; // @FIXME
+  // Puertos
+  uint16_t sink_port = 8421;
+
+  CommandLine cmd;
   cmd.AddValue("NumeroNodosAcceso1", "Número de nodos en la red de acceso 1", nodos_acceso_1);
   cmd.AddValue("NumeroNodosAcceso2", "Número de nodos en la red de acceso 2", nodos_acceso_2);
   cmd.AddValue("NumeroNodosWifi",    "Número de nodos que usan wifi",         nodos_wifi);
@@ -67,151 +53,101 @@ main ( int argc, char * argv[])
   cmd.AddValue("Delayt",             "Retardo de la red troncal",             delay_t);
   cmd.Parse (argc, argv);
 
-  // Variables de trazas
+  // Variables del sistema
   Trazas traza;
- 
-  NodeContainer acceso1, acceso2, troncal, wifi;
-  troncal.Create(2);
-  acceso1.Create(nodos_acceso_1);
-  acceso2.Create(nodos_acceso_2);
-  wifi.Create(nodos_wifi);
+  Topologia topologia;
 
-  NodeContainer total(acceso1, acceso2, troncal, wifi);
-  // añadimos nodos compartidos (routers)
-  acceso1.Add(troncal.Get (0));
-  acceso2.Add(troncal.Get (1));
-  wifi.Add(troncal.Get(0));
-
-  //Modelo de errores
-  Ptr<RateErrorModel> error = CreateObject<RateErrorModel> ();
-  Ptr<UniformRandomVariable> uv = CreateObject<UniformRandomVariable> ();
-  error->SetRandomVariable (uv);
-  error->SetUnit(RateErrorModel::ERROR_UNIT_PACKET);
-  error->SetRate(TASA_ERRORES);
-
+  // Añadimos los contenedores de nodos
   NS_LOG_INFO ("Creando Topologia");
-  // Redes de acceso
-  CsmaHelper csma_acceso1, csma_acceso2;
-  csma_acceso1.SetChannelAttribute ("DataRate", DataRateValue (DataRate (data_rate_1)));
-  csma_acceso1.SetChannelAttribute ("Delay", StringValue (delay_1));
-  csma_acceso2.SetChannelAttribute ("DataRate", DataRateValue (DataRate (data_rate_2)));
-  csma_acceso2.SetChannelAttribute ("Delay", StringValue (delay_2));
-  // Wifi
-  WifiHelper wifi_acceso1 = WifiHelper::Default ();
-  NqosWifiMacHelper wifiMac_acceso1 = NqosWifiMacHelper::Default (); 
-  wifiMac_acceso1.SetType ("ns3::AdhocWifiMac");
-  YansWifiPhyHelper wifiPhy_acceso1 = YansWifiPhyHelper::Default ();
-  YansWifiChannelHelper wifiChannel_acceso1 = YansWifiChannelHelper::Default (); 
-  wifiPhy_acceso1.SetChannel (wifiChannel_acceso1.Create ());
+  topologia.AddContainer ("troncal", 2);
+  topologia.AddContainer ("acceso1", nodos_acceso_1);
+  topologia.AddContainer ("acceso2", nodos_acceso_2);
+  topologia.AddContainer ("wifi", nodos_wifi);
 
-  // Red troncal
-  PointToPointHelper point;
-  point.SetDeviceAttribute ("DataRate", DataRateValue (DataRate (data_rate_t)));
-  point.SetChannelAttribute ("Delay", StringValue (delay_t)); 
+  // Añadimos los routers para formar las subredes
+  topologia.GetNodeContainer ("acceso1")->Add (topologia.GetNodeContainer ("troncal")->Get (0));
+  topologia.GetNodeContainer ("acceso2")->Add (topologia.GetNodeContainer ("troncal")->Get (1));
+  topologia.GetNodeContainer ("wifi")->Add (topologia.GetNodeContainer ("troncal")->Get (0));
 
-  // We will use these NetDevice containers later, for IP addressing
-  NetDeviceContainer ndacceso1 = csma_acceso1.Install (acceso1);  // Primera red de acceso
-  NetDeviceContainer ndacceso2 = csma_acceso2.Install (acceso2);  // Segunda red de acceso
-  NetDeviceContainer ndtroncal = point.Install (troncal);         // Red troncal
-  NetDeviceContainer ndwifi = wifi_acceso1.Install (wifiPhy_acceso1, wifiMac_acceso1, wifi);
+  // Creamos las redes CSMA
+  topologia.AddCsmaNetwork("acceso1", data_rate_1, delay_1);
+  topologia.AddCsmaNetwork("acceso2", data_rate_2, delay_2);
 
-  NS_LOG_INFO ("Add IP Stack.");
-  // InternetStackHelper internet_acceso1;
-  // internet_acceso1.Install (acceso1);
-  // InternetStackHelper internet_acceso2;
-  // internet_acceso2.Install (acceso2);
-  // InternetStackHelper internet_wifi;
-  // internet_wifi.Install (wifi);
-  InternetStackHelper().Install(total);
+  // Y las Wifi
+  topologia.AddWifiNetwork("wifi");
 
-  NS_LOG_INFO ("Assign IP Addresses.");
-  Ipv4AddressHelper ipv4Addr;
-  Ipv4InterfaceContainer icacceso1, icacceso2, ictroncal, icwifi;
-  ipv4Addr.SetBase ("10.1.1.0", "255.255.255.0");
-  icacceso1 = ipv4Addr.Assign (ndacceso1);
-  ipv4Addr.SetBase ("10.1.2.0", "255.255.255.0");
-  icacceso2 = ipv4Addr.Assign (ndacceso2);
-  ipv4Addr.SetBase ("10.1.3.0", "255.255.255.0");
-  ictroncal = ipv4Addr.Assign (ndtroncal);
-  ipv4Addr.SetBase ("10.1.4.0", "255.255.255.0");
-  icwifi = ipv4Addr.Assign (ndwifi);
+  // Y el PPP troncal
+  topologia.AddPPPNetwork("troncal", data_rate_t, delay_t);
+
+  NS_LOG_INFO ("Añadimos el stack IP");
+  topologia.BuildInternetStack ();
+
+  NS_LOG_INFO ("Asignamos direcciones IP.");
+  topologia.SetIpToNetwork ("acceso1", "10.1.1.0", "255.255.255.0");
+  topologia.SetIpToNetwork ("acceso2", "10.1.2.0", "255.255.255.0");
+  topologia.SetIpToNetwork ("troncal", "10.1.3.0", "255.255.255.0");
+  topologia.SetIpToNetwork ("wifi", "10.1.4.0", "255.255.255.0");
 
   // Popular tablas de routing
   Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
-  NS_LOG_INFO ("Installing static mobility; distance " << distance << " .");
-  MobilityHelper mobility;
-  Ptr<ListPositionAllocator> positionAlloc =
-    CreateObject<ListPositionAllocator>();
-  positionAlloc->Add (Vector (0.0, 0.0, 0.0));
-  positionAlloc->Add (Vector (0.0, distance, 0.0));
-  mobility.SetPositionAllocator (positionAlloc);
-  mobility.Install (wifi);
+  // Añadimos el sistema de mobilidad a la red wifi
+  topologia.AddMobility ("wifi", distance);
   
-  //Trazas///////////////////////////////////////////////////
-  NS_LOG_INFO("Preparamos las trazas");
-  Ptr<NetDevice> nd_router0 = troncal.Get (0)->GetDevice (1); 
-  Ptr<NetDevice> nd_router1 = troncal.Get (1)->GetDevice (1);
+  // Añadimos las trazas a los routers de la troncal
   NS_LOG_INFO("Monitorizamos los dos routers");
-  traza.Monitorize ("r0", nd_router0);
-  traza.Monitorize ("r1", nd_router1);
-  NS_LOG_INFO("Fin de trazas");
-  ///////////////////////////////////////////////////////////
+  traza.Monitorize ("r0", topologia.GetNetDeviceContainer("troncal")->Get (0));
+  traza.Monitorize ("r1", topologia.GetNetDeviceContainer("troncal")->Get (1));
 
+  // Añadimos los modelos de errores
+  topologia.SetErrorModel("troncal", 0.1);
 
-  //Para los errores////////////////////////////////////////
-  Ptr<PointToPointNetDevice> device_router0 = nd_router0->GetObject<PointToPointNetDevice> ();
-  Ptr<PointToPointNetDevice> device_router1 = nd_router1->GetObject<PointToPointNetDevice> ();
-  device_router0->SetReceiveErrorModel(error);
-  device_router1->SetReceiveErrorModel(error);
-  //////////////////////////////////////////////////////////
-
-  // Sumidero
-  uint16_t port = 8421;
-  PacketSinkHelper sinkTcp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port)));
-  PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), port)));
+  // Comenzamos a añadir aplicaciones...
+  // Sumideros
+  PacketSinkHelper sinkTcp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
+  PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
   
-  ApplicationContainer sink1 = sinkTcp.Install (acceso2.Get (0)); // Node n4
+  ApplicationContainer sink1 = sinkTcp.Install (topologia.GetNodeContainer("acceso2")->Get (0));
   sink1.Start (Seconds (1.0));
   sink1.Stop (Seconds (10.0));
 
-  ApplicationContainer sink2 = sinkUdp.Install (acceso2.Get (0)); 
+  ApplicationContainer sink2 = sinkUdp.Install (topologia.GetNodeContainer("acceso2")->Get (0)); 
   sink2.Start (Seconds (1.0));
   sink2.Stop (Seconds (10.0));
 
-  //Navegador//////////////////////////////////////////////////
-  NavegadorHelper chrome (icacceso2.GetAddress(0), port);
-  //Se instala la aplicación navegador
-  ApplicationContainer navegador = chrome.Install (acceso1.Get(0));
+  // Navegador
+  NavegadorHelper chrome (topologia.GetInterfaceContainer("acceso2")->GetAddress (1), sink_port);
+  // Se instala la aplicación navegador
+  ApplicationContainer navegador = chrome.Install (topologia.GetNodeContainer("acceso1")->Get (0));
   navegador.Start (Seconds (1.0));
   navegador.Stop (Seconds (10.0));
   
-  // Telefono IP///////////////////////////////////////////////
-  VoipHelper ciscoPhone (icacceso2. GetAddress(0), port);
-  ApplicationContainer app_voip = ciscoPhone.Install (acceso1.Get (0));
+  // Telefono IP
+  VoipHelper ciscoPhone (topologia.GetInterfaceContainer("acceso2")->GetAddress (0), sink_port);
+  ApplicationContainer app_voip = ciscoPhone.Install (topologia.GetNodeContainer("acceso1")->Get (0));
+  // Se instala la aplicacion Voip
   app_voip.Start (Seconds (1.0));
   app_voip.Stop (Seconds (10.0));
-  /////////////////////////////////////////////////////////////
    
-  //Transferencia fichero//////////////////////////////////////
-  //TransferenciaHelper ftp (icacceso2.GetAddress(1), port);
-  //Se instala la aplicación transferencia
-  //ApplicationContainer transferencia = ftp.Install (acceso1.Get(0));
-  //transferencia.Start (Seconds(1.0));
-  //transferencia.Stop (Seconds(10.0));
-  //////////////////////////////////////////////////////////////
+  // Transferencia fichero
+  TransferenciaHelper ftp (topologia.GetInterfaceContainer("acceso2")->GetAddress (1), sink_port);
+  // Se instala la aplicación transferencia
+  ApplicationContainer transferencia = ftp.Install (topologia.GetNodeContainer("acceso1")->Get (0));
+  transferencia.Start (Seconds(1.0));
+  transferencia.Stop (Seconds(10.0));
 
-  if(tracing)
-    {
-      AsciiTraceHelper ascii;
-      // csma.EnableAsciiAll (ascii.CreateFileStream ("csma-prueba.tr"));
-      csma_acceso1.EnablePcapAll ("csma-acceso1", false);
-      csma_acceso2.EnablePcapAll ("csma-acceso2", false);
-    }
+  // Activamos la creacion de archivos PCAPs
+  if(tracing) {
+    topologia.EnablePCAPLogging ("acceso1");
+    topologia.EnablePCAPLogging ("acceso2");
+  }
 
-  NS_LOG_INFO ("Run Simulation");
+  NS_LOG_INFO ("Ejecutando simulacion...");
   Simulator::Run();
+
+  // Imprimimos todas las trazas monitorizadas
   traza.ImprimeTrazas();
+
   Simulator::Destroy ();
   NS_LOG_INFO ("Done");
 }

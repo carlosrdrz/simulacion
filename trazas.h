@@ -3,7 +3,7 @@
   Fichero: trazas.h
   Librería de la clase Trazas
 */
-using namespace ns3;
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -16,9 +16,10 @@ using namespace ns3;
 #include "ns3/internet-module.h"
 #include "ns3/point-to-point-module.h"
 #include "ns3/callback.h"
-#include "ns3/internet-module.h"
+#include "ns3/applications-module.h"
 
 using namespace std;
+using namespace ns3;
 
 class Trazas
 {
