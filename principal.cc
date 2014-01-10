@@ -23,8 +23,9 @@
 #include "ns3/internet-module.h"
 #include "trazas.h"
 #include "navegador.h"
+#include "voip.h"
 
-#define TASA_ERRORES 0.1
+#define TASA_ERRORES 0.01
 
 using namespace ns3;
 
@@ -42,7 +43,7 @@ main ( int argc, char * argv[])
 
   bool tracing=true;
   unsigned nodos_acceso_1 = 2;
-  unsigned nodos_acceso_2 = 2;
+  unsigned nodos_acceso_2 = 4;
   unsigned nodos_wifi = 1;
   double distance = 50.0;
   std::string data_rate_1   = "5Mbps";
@@ -183,11 +184,18 @@ main ( int argc, char * argv[])
   //onoff.SetAttribute("OnTime", PointerValue(varon));
   //onoff.SetAttribute("OffTime", PointerValue(varoff));
   // "EL NAVEGADOR"
-  NavegadorHelper chrome (0.4,0.6, icacceso2.GetAddress(1), port);
+    NavegadorHelper chrome (0.4,0.6, icacceso2.GetAddress(1), port);
   //Se instala la aplicación onoff
   ApplicationContainer app = chrome.Install (wifi.Get (0));
   app.Start (Seconds (1.0));
   app.Stop (Seconds (10.0));
+  
+  // "El TELÉFONO SOBRE IP"
+  VoipHelper ciscoPhone (icacceso2. GetAddress(1), port);
+  ApplicationContainer app_voip = ciscoPhone.Install (wifi.Get (0));
+  app_voip.Start (Seconds (1.0));
+  app_voip.Stop (Seconds (10.0));
+
   /////////////////////////////////////////////////////////////
   if(tracing)
     {
