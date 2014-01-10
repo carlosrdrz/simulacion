@@ -14,14 +14,15 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("CsmaMulticastExample");
+NS_LOG_COMPONENT_DEFINE ("Principal");
 
 int
 main ( int argc, char * argv[])
 {
   /////// LOG //////////////////////
   LogComponentEnable("Trazas", LOG_LEVEL_INFO);
-  LogComponentEnable("CsmaMulticastExample", LOG_LEVEL_INFO);
+  LogComponentEnable("Topologia", LOG_LEVEL_INFO);
+  LogComponentEnable("Principal", LOG_LEVEL_INFO);
   // LogComponentEnable("Trazas", LOG_LEVEL_ALL);
 
   Config::SetDefault ("ns3::CsmaNetDevice::EncapsulationMode", StringValue ("Dix"));

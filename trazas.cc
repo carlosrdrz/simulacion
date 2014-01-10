@@ -13,7 +13,7 @@ NS_LOG_COMPONENT_DEFINE ("Trazas");
 
 Trazas::~Trazas()
 {
-  std::cout << "Destructor trazas" << std::endl;
+  NS_LOG_FUNCTION(this);
   for (std::map<std::string,Datos*>::iterator it=valores.begin(); it!=valores.end(); ++it) {
     delete it->second;
   }
@@ -77,7 +77,7 @@ Trazas::ImprimeTrazas()
     const std::string id = it->first;
     std::cout << "Paquetes enviados por el dispositivo " << id << ": " << GetPaquetesEnviados(id) << std::endl;
     std::cout << "Paquetes recibidos por el dispositivo " << id << ": " << GetPaquetesRecibidos(id) << std::endl;
-   std::cout << "Paquetes perdidos por el dispositivo " << id << ": " << GetPaquetesPerdidos(id) << std::endl;
+    std::cout << "Paquetes perdidos por el dispositivo " << id << ": " << GetPaquetesPerdidos(id) << std::endl;
     
     std::cout << "Bytes enviados por el dispositivo " << id << ": " << GetBytesEnviados(id) << std::endl;
     std::cout << "Bytes recibidos por el dispositivo " << id << ": " << GetBytesRecibidos(id) << std::endl;

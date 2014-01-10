@@ -7,9 +7,11 @@
 
 using namespace ns3;
 
+NS_LOG_COMPONENT_DEFINE ("Topologia");
+
 Topologia::~Topologia()
 {
-  std::cout << "Destructor topologia" << std::endl;
+  NS_LOG_FUNCTION(this);
   for (std::map<std::string, NodeContainer*>::iterator it = subnets.begin (); it != subnets.end (); ++it) {
     delete it->second;
   }
