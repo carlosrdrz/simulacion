@@ -19,9 +19,13 @@ Topologia::~Topologia()
   for (std::map<std::string, Ipv4InterfaceContainer*>::iterator it = ips.begin (); it != ips.end (); ++it) {
     delete it->second;
   }
+  for (std::map<std::string, PcapHelperForDevice*>::iterator it = pcaps_helpers.begin (); it != pcaps_helpers.end (); ++it) {
+    delete it->second;
+  }
   subnets.clear();
   netdevices.clear();
   ips.clear();
+  pcaps_helpers.clear();
 }
 
 void Topologia::AddContainer (std::string nombre, int numNode)
