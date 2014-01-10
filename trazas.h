@@ -1,8 +1,9 @@
-//#if 0
 /*
   Fichero: trazas.h
   Librería de la clase Trazas
 */
+
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -33,14 +34,20 @@ public:
   int GetPaquetesEnviados (std::string id)const; //throw(std::out_of_range)
 
   int GetPaquetesRecibidos (std::string id)const; //throw(std::out_of_range)
+  
+  int GetPaquetesPerdidos (std::string id)const; //throw(std::out_of_range)
 
   int GetBytesEnviados (std::string id)const; //throw(std::out_of_range)
 
   int GetBytesRecibidos (std::string id)const; //throw(std::out_of_range)
+  
+  int GetBytesPerdidos (std::string id)const; //throw(std::out_of_range)
 
-  void DispositivoRecibe (std::string id, Ptr<const Packet> paquete);
+  void DispositivoRecibe (std::string id, Ptr<const Packet> paquete); //throw(std::out_of_range)
 
-  void DispositivoEnvia (std::string id, Ptr<const Packet> paquete);
+  void DispositivoEnvia (std::string id, Ptr<const Packet> paquete); //throw(std::out_of_range)
+
+  void DispositivoPierde (std::string id, Ptr<const Packet> paquete); //throw(std::out_of_range)
   
   void ImprimeTrazas ();
 
@@ -54,8 +61,10 @@ private:
   public:
     int paquetesEnviados;
     int paquetesRecibidos;
+    int paquetesPerdidos;
     int bytesEnviados;
     int bytesRecibidos;
+    int bytesPerdidos;
 
     // Método llamado en la traza de envío que aumenta un contador
     void DispositivoEnvia(Ptr<const Packet> paquete)
@@ -70,8 +79,14 @@ private:
       paquetesRecibidos++;
       bytesRecibidos += paquete->GetSize();
     }
+    
+    //Método llamado en la traza de paquetes perdidos que aumenta un cont.
+    void DispositivoPierde(Ptr<const Packet> paquete)
+    {
+      paquetesPerdidos++;
+      bytesPerdidos += paquete->GetSize();
+    }
   };
 
 };
 
-//#endif
