@@ -43,6 +43,16 @@ NodeContainer* Topologia::GetNodeContainer (std::string nombre)
 	return subnets.at(nombre);
 }
 
+void Topologia::AddNodeToContainer (std::string origen, int numNode, std::string destino)
+{
+  GetNodeContainer (destino)->Add (GetNodeContainer (origen)->Get (numNode));
+}
+
+Ptr<Node> Topologia::GetNode (std::string from, int numNode)
+{
+  return GetNodeContainer (from)->Get (numNode);
+}
+
 void Topologia::BuildInternetStack ()
 {
 	InternetStackHelper().Install(nodes);
@@ -82,6 +92,11 @@ NetDeviceContainer* Topologia::GetNetDeviceContainer (std::string nombre)
   return netdevices.at(nombre);
 }
 
+Ptr<NetDevice> Topologia::GetNetDevice (std::string from, int numNode)
+{
+  return GetNetDeviceContainer(from)->Get (numNode);
+}
+
 void Topologia::AddMobility (std::string to, double distance)
 {
   MobilityHelper mobility;
@@ -102,6 +117,11 @@ void Topologia::SetIpToNetwork (std::string to, std::string base, std::string ma
 Ipv4InterfaceContainer* Topologia::GetInterfaceContainer (std::string nombre)
 {
   return ips.at(nombre);
+}
+
+Ipv4Address Topologia::GetIPv4Address (std::string from, int num)
+{
+  return GetInterfaceContainer(from)->GetAddress (num);
 }
 
 void Topologia::SetErrorModel (std::string to, float tasa)

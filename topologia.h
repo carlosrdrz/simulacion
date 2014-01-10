@@ -19,6 +19,8 @@ public:
 
 	void AddContainer (std::string nombre, int numNode);
 	ns3::NodeContainer* GetNodeContainer (std::string nombre);
+	void AddNodeToContainer (std::string origen, int numNode, std::string destino);
+	ns3::Ptr<ns3::Node> GetNode (std::string from, int numNode);
 
 	void BuildInternetStack ();
 
@@ -26,11 +28,13 @@ public:
 	void AddWifiNetwork (std::string to);
 	void AddPPPNetwork (std::string to, std::string data_rate, std::string delay);
 	ns3::NetDeviceContainer* GetNetDeviceContainer (std::string nombre);
+	ns3::Ptr<ns3::NetDevice> GetNetDevice (std::string from, int numNode);
 
 	void AddMobility (std::string to, double distance);
 
 	void SetIpToNetwork (std::string to, std::string base, std::string mask);
 	ns3::Ipv4InterfaceContainer* GetInterfaceContainer (std::string nombre);
+	ns3::Ipv4Address GetIPv4Address (std::string from, int num);
 
 	void SetErrorModel (std::string to, float tasa);
 
