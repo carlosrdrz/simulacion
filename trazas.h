@@ -29,13 +29,13 @@ public:
 
   void Monitorize (std::string id, Ptr<NetDevice> r);
 
-  int GetPaquetesEnviados (std::string id)const;
+  int GetPaquetesEnviados (std::string id)const; //throw(std::out_of_range)
 
-  int GetPaquetesRecibidos (std::string id)const;
+  int GetPaquetesRecibidos (std::string id)const; //throw(std::out_of_range)
 
-  int GetBytesEnviados (std::string id)const;
+  int GetBytesEnviados (std::string id)const; //throw(std::out_of_range)
 
-  int GetBytesRecibidos (std::string id)const;
+  int GetBytesRecibidos (std::string id)const; //throw(std::out_of_range)
 
   void DispositivoRecibe (std::string id, Ptr<const Packet> paquete);
 
