@@ -1,8 +1,9 @@
-//#if 0
 /*
   Fichero: trazas.h
   Librería de la clase Trazas
 */
+
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -30,23 +31,23 @@ public:
 
   void Monitorize (std::string id, Ptr<NetDevice> r);
 
-  int GetPaquetesEnviados (std::string id)const;
+  int GetPaquetesEnviados (std::string id)const; //throw(std::out_of_range)
 
-  int GetPaquetesRecibidos (std::string id)const;
+  int GetPaquetesRecibidos (std::string id)const; //throw(std::out_of_range)
   
-  int GetPaquetesPerdidos (std::string id)const;
+  int GetPaquetesPerdidos (std::string id)const; //throw(std::out_of_range)
 
-  int GetBytesEnviados (std::string id)const;
+  int GetBytesEnviados (std::string id)const; //throw(std::out_of_range)
 
-  int GetBytesRecibidos (std::string id)const;
+  int GetBytesRecibidos (std::string id)const; //throw(std::out_of_range)
   
-  int GetBytesPerdidos (std::string id)const;
+  int GetBytesPerdidos (std::string id)const; //throw(std::out_of_range)
 
-  void DispositivoRecibe (std::string id, Ptr<const Packet> paquete);
+  void DispositivoRecibe (std::string id, Ptr<const Packet> paquete); //throw(std::out_of_range)
 
-  void DispositivoEnvia (std::string id, Ptr<const Packet> paquete);
+  void DispositivoEnvia (std::string id, Ptr<const Packet> paquete); //throw(std::out_of_range)
 
-  void DispositivoPierde (std::string id, Ptr<const Packet> paquete);
+  void DispositivoPierde (std::string id, Ptr<const Packet> paquete); //throw(std::out_of_range)
   
   void ImprimeTrazas ();
 
@@ -89,4 +90,3 @@ private:
 
 };
 
-//#endif
