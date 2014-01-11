@@ -28,6 +28,8 @@ public:
   ~NavegadorHelper ();
 
 private:
-  Ptr<ConstantRandomVariable> varon;
-  Ptr<ConstantRandomVariable> varoff;
+  //Declaración de variables uniformes aleatorias
+  //para ajustar Ton y Toff
+  Ptr<UniformRandomVariable> varon;
+  Ptr<UniformRandomVariable> varoff;
 };
