@@ -27,6 +27,14 @@ using namespace ns3;
 NavegadorHelper::NavegadorHelper(Ipv4Address address, uint16_t port)
   :OnOffHelper("ns3::TcpSocketFactory", Address (InetSocketAddress (address,port)))
 {
+  /////////////////////////////////////////////
+  /////////////////////////////////////////////
+  //////////SEMILLAAAAAAAAAAAAAAAAA////////////
+  SeedManager::SetSeed(2);
+  SeedManager::SetRun(2);
+  ///////Aquí hay que investigar algo//////////
+  /////////////////////////////////////////////
+
   //Variable para TON
   varon = CreateObject <UniformRandomVariable>();
   varon->SetAttribute("Max", DoubleValue(MAXONNAV));
@@ -41,6 +49,7 @@ NavegadorHelper::NavegadorHelper(Ipv4Address address, uint16_t port)
   SetAttribute("OffTime", PointerValue(varoff));
 
   std::cout<<"Valor de OnTime: "<<varon->GetValue()<<std::endl;
+  std::cout<<"Valor de OnTime: "<<varon->GetValue(MINONNAV,MAXONNAV)<<std::endl;
   std::cout<<"Valor de OffTime: "<<varoff->GetValue()<<std::endl;
 }
 NavegadorHelper::~NavegadorHelper()
