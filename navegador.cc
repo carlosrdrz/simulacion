@@ -18,23 +18,39 @@
 #include "navegador.h"
 using namespace ns3;
 
-#define ONTIMENAV 0.4
-#define OFFTIMENAV 0.6
+#define MAXONNAV 0.4
+#define MINONNAV 0.2
+#define MAXOFFNAV 0.8
+#define MINOFFNAV 0.6
 
 //antiguamente: const char *address
 NavegadorHelper::NavegadorHelper(Ipv4Address address, uint16_t port)
   :OnOffHelper("ns3::TcpSocketFactory", Address (InetSocketAddress (address,port)))
 {
-  varon=CreateObject<ConstantRandomVariable>();
-  varoff=CreateObject<ConstantRandomVariable>();
-  varon->SetAttribute("Constant", DoubleValue(ONTIMENAV));
-  varoff->SetAttribute("Constant", DoubleValue(OFFTIMENAV));
-  //Probar con this->
+  /////////////////////////////////////////////
+  /////////////////////////////////////////////
+  //////////SEMILLAAAAAAAAAAAAAAAAA////////////
+  SeedManager::SetSeed(2);
+  SeedManager::SetRun(2);
+  ///////Aquí hay que investigar algo//////////
+  /////////////////////////////////////////////
+
+  //Variable para TON
+  varon = CreateObject <UniformRandomVariable>();
+  varon->SetAttribute("Max", DoubleValue(MAXONNAV));
+  varon->SetAttribute("Min", DoubleValue(MINONNAV));
+  //Variable para TOFF
+  varoff = CreateObject <UniformRandomVariable>();
+  varoff->SetAttribute("Max", DoubleValue(MAXOFFNAV));
+  varoff->SetAttribute("Min", DoubleValue(MINOFFNAV));
+ 
   SetConstantRate (DataRate ("500kb/s"));
   SetAttribute("OnTime", PointerValue(varon));
   SetAttribute("OffTime", PointerValue(varoff));
-  
 
+  std::cout<<"Valor de OnTime: "<<varon->GetValue()<<std::endl;
+  std::cout<<"Valor de OnTime: "<<varon->GetValue(MINONNAV,MAXONNAV)<<std::endl;
+  std::cout<<"Valor de OffTime: "<<varoff->GetValue()<<std::endl;
 }
 NavegadorHelper::~NavegadorHelper()
 {
