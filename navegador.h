@@ -3,12 +3,9 @@
   Descripción: librería de la clase Navegador
   que hereda de OnOffHelper
 */
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <stdlib.h>
-#include <cassert>
-#include "ns3/core-module.h"
+
+#pragma once
+
 #include "ns3/network-module.h"
 #include "ns3/csma-module.h"
 #include "ns3/applications-module.h"

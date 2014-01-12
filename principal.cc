@@ -5,12 +5,13 @@
   y la topología.
 */
 
+#include "navegador.h"
 #include <iostream>
 #include "trazas.h"
 #include "topologia.h"
-#include "navegador.h"
 #include "transferencia.h"
 #include "voip.h"
+#include "servidor.h"
 
 using namespace ns3;
 
@@ -28,8 +29,8 @@ main ( int argc, char * argv[])
   Config::SetDefault ("ns3::CsmaNetDevice::EncapsulationMode", StringValue ("Dix"));
 
   bool tracing              = true;
-  unsigned nodos_acceso_1   = 2;
-  unsigned nodos_acceso_2   = 2;
+  unsigned nodos_acceso_1   = 1;
+  unsigned nodos_acceso_2   = 1;
   unsigned nodos_wifi       = 1;
   double distance           = 50.0;
   std::string data_rate_1   = "5Mbps";
@@ -101,37 +102,38 @@ main ( int argc, char * argv[])
 
   // Comenzamos a añadir aplicaciones...
   // Sumideros
-  PacketSinkHelper sinkTcp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
-  PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
+  // PacketSinkHelper sinkTcp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
+  Servidor servidor(topologia.GetNode("empresa", 0));
+  // PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
   
-  ApplicationContainer sink1 = sinkTcp.Install (topologia.GetNode("empresa", 0));
-  sink1.Start (Seconds (1.0));
-  sink1.Stop (Seconds (10.0));
+  //servidor.SetNode (topologia.GetNode("empresa", 0));
+  //sink1.Start (Seconds (1.0));
+  //sink1.Stop (Seconds (10.0));
 
-  ApplicationContainer sink2 = sinkUdp.Install (topologia.GetNode("empresa", 0)); 
-  sink2.Start (Seconds (1.0));
-  sink2.Stop (Seconds (10.0));
+  //ApplicationContainer sink2 = sinkUdp.Install (topologia.GetNode("empresa", 0)); 
+  //sink2.Start (Seconds (1.0));
+  //sink2.Stop (Seconds (10.0));
 
   // Navegador
-  NavegadorHelper chrome (topologia.GetIPv4Address("empresa", 1), sink_port);
+  NavegadorHelper chrome (topologia.GetIPv4Address("empresa", 0), sink_port);
   // Se instala la aplicación navegador
   ApplicationContainer navegador = chrome.Install (topologia.GetNode("acceso", 0));
   navegador.Start (Seconds (1.0));
   navegador.Stop (Seconds (10.0));
   
   // Telefono IP
-  VoipHelper ciscoPhone (topologia.GetIPv4Address("empresa", 0), sink_port);
-  ApplicationContainer app_voip = ciscoPhone.Install (topologia.GetNode("acceso", 0));
+  // VoipHelper ciscoPhone (topologia.GetIPv4Address("empresa", 0), sink_port);
+  // ApplicationContainer app_voip = ciscoPhone.Install (topologia.GetNode("acceso", 0));
   // Se instala la aplicacion Voip
-  app_voip.Start (Seconds (1.0));
-  app_voip.Stop (Seconds (10.0));
+  // app_voip.Start (Seconds (1.0));
+  // app_voip.Stop (Seconds (10.0));
    
   // Transferencia fichero
-  TransferenciaHelper ftp (topologia.GetIPv4Address("empresa", 1), sink_port);
+  //TransferenciaHelper ftp (topologia.GetIPv4Address("empresa", 1), sink_port);
   // Se instala la aplicación transferencia
-  ApplicationContainer transferencia = ftp.Install (topologia.GetNode("acceso", 0));
-  transferencia.Start (Seconds(1.0));
-  transferencia.Stop (Seconds(10.0));
+  //ApplicationContainer transferencia = ftp.Install (topologia.GetNode("acceso", 0));
+  // transferencia.Start (Seconds(1.0));
+  // transferencia.Stop (Seconds(10.0));
 
   // Activamos la creacion de archivos PCAPs
   if(tracing) {
