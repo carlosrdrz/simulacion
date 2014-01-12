@@ -19,7 +19,6 @@ NS_LOG_COMPONENT_DEFINE ("Principal");
 int
 main ( int argc, char * argv[])
 {
-  /////// LOG //////////////////////
   LogComponentEnable("Trazas", LOG_LEVEL_INFO);
   LogComponentEnable("Topologia", LOG_LEVEL_INFO);
   LogComponentEnable("Principal", LOG_LEVEL_INFO);
@@ -37,7 +36,10 @@ main ( int argc, char * argv[])
   std::string delay_1       = "0.002";
   std::string delay_2       = "0.002";
   std::string delay_t       = "0.002";
-
+  
+  double tasa=5000000;
+  double tiempo=9;
+  
   // Puertos
   uint16_t sink_port = 8421;
 
@@ -140,10 +142,8 @@ main ( int argc, char * argv[])
 
   NS_LOG_INFO ("Ejecutando simulacion...");
   Simulator::Run();
-
   // Imprimimos todas las trazas monitorizadas
-  traza.ImprimeTrazas();
-
+  traza.ImprimeTrazas(tasa,tiempo);
   Simulator::Destroy ();
   NS_LOG_INFO ("Done");
 }
