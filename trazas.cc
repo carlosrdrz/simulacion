@@ -71,7 +71,7 @@ void
 Trazas::ImprimeTrazas()
 {
  std::cout << "#################" << std::endl;
- std::cout << "Trazas obtenidas: " << std::endl;
+ std::cout << "Datos obtenidos: " << std::endl;
  std::cout << "#################" << std::endl;
   for (std::map<std::string,Datos*>::const_iterator it=valores.begin(); it!=valores.end(); ++it) {
     const std::string id = it->first;
@@ -82,7 +82,35 @@ Trazas::ImprimeTrazas()
     std::cout << "Bytes enviados por el dispositivo " << id << ": " << GetBytesEnviados(id) << std::endl;
     std::cout << "Bytes recibidos por el dispositivo " << id << ": " << GetBytesRecibidos(id) << std::endl;
     std::cout << "Bytes perdidos por el dispositivo " << id << ": " << GetBytesPerdidos(id) << std::endl;
+
   }
 }
+//Muestra los contadores y calcula el rendimiento del enlace
+double
+Trazas::ImprimeTrazas(double tasa, double tiempo_total)
+{
+ std::cout << "#################" << std::endl;
+ std::cout << "Datos obtenidos:" << std::endl;
+ std::cout << "#################" << std::endl;
+  for (std::map<std::string,Datos*>::const_iterator it=valores.begin(); it!=valores.end(); ++it) {
+    const std::string id = it->first;
+    std::cout << "Paquetes enviados por el dispositivo " << id << ": " << GetPaquetesEnviados(id) << std::endl;
+    std::cout << "Paquetes recibidos por el dispositivo " << id << ": " << GetPaquetesRecibidos(id) << std::endl;
+    std::cout << "Paquetes perdidos por el dispositivo " << id << ": " << GetPaquetesPerdidos(id) << std::endl;
+    
+    std::cout << "Bytes enviados por el dispositivo " << id << ": " << GetBytesEnviados(id) << std::endl;
+    std::cout << "Bytes recibidos por el dispositivo " << id << ": " << GetBytesRecibidos(id) << std::endl;
+    std::cout << "Bytes perdidos por el dispositivo " << id << ": " << GetBytesPerdidos(id) << std::endl;
 
+  }
+  //Cálculo del rendimiento del enlace
+  for (std::map<std::string,Datos*>::const_iterator it=valores.begin(); it!=valores.end(); ++it) {
+    const std::string id = it->first;
+    total_bytes_recibidos+=GetBytesRecibidos(id);
+  }
+  rendimiento=(total_bytes_recibidos*OCTETO)/(tasa*tiempo_total);
+  std::cout << "Rendimiento del canal: " << rendimiento << std::endl;
+  return rendimiento*POR_CIENTO;
+}
 //#endif
+ 
