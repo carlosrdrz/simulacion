@@ -7,9 +7,9 @@ using namespace ns3;
 NS_LOG_COMPONENT_DEFINE ("Servidor");
 
 Servidor::Servidor(Ptr< Node > disp)
-:Application()
+:Application(),m_node(PeekPointer(disp))
 {
-  m_node = disp;
+  //m_node = disp.Copy();
   DoInitialize();
 }
 
@@ -84,6 +84,7 @@ void Servidor::DoInitialize()
  int status;
  status = m_socket->Bind (src);
  NS_ASSERT (status != -1);
+ status = m_socket->Listen();
 
  // InetSocketAddress dst = InetSocketAddress (m_remote, 0);
  // status = m_socket->Connect (dst);
