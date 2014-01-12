@@ -12,6 +12,10 @@
 #include "transferencia.h"
 #include "voip.h"
 
+//#define TSTUDENT 1.8331 //10 Simulaciones con 90% de intervalo de confianza
+
+
+
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("Principal");
@@ -38,6 +42,9 @@ main ( int argc, char * argv[])
   std::string delay_1       = "0.002";
   std::string delay_2       = "0.002";
   std::string delay_t       = "0.002";
+ // float tasa = 0;   //tasa de errores
+ // int indice = 0;   
+ // Average<double> acumulador_rendimiento;
 
   // Puertos
   uint16_t sink_port = 8421;
@@ -54,6 +61,8 @@ main ( int argc, char * argv[])
   cmd.AddValue("Delayt",             "Retardo de la red troncal",             delay_t);
   cmd.Parse (argc, argv);
 
+ //for(tasa = 0.1; tasa <= 0.5; tasa)
+ //{
   // Variables del sistema
   Trazas traza;
   Topologia topologia;
@@ -147,4 +156,5 @@ main ( int argc, char * argv[])
 
   Simulator::Destroy ();
   NS_LOG_INFO ("Done");
+//}
 }
