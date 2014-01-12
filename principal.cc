@@ -23,7 +23,6 @@ main ( int argc, char * argv[])
   LogComponentEnable("Trazas", LOG_LEVEL_INFO);
   LogComponentEnable("Topologia", LOG_LEVEL_INFO);
   LogComponentEnable("Principal", LOG_LEVEL_INFO);
-  // LogComponentEnable("Trazas", LOG_LEVEL_ALL);
 
   Config::SetDefault ("ns3::CsmaNetDevice::EncapsulationMode", StringValue ("Dix"));
 
