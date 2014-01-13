@@ -19,6 +19,9 @@
 #include "ns3/callback.h"
 #include "ns3/applications-module.h"
 
+#define OCTETO 8 
+#define POR_CIENTO 100
+
 using namespace std;
 using namespace ns3;
 
@@ -51,7 +54,13 @@ public:
   
   void ImprimeTrazas ();
 
+  double ImprimeTrazas(double tasa, double tiempo_total);
+
 private:
+
+  //double necesarios para obtener el rendimiento
+  double rendimiento;
+  double total_bytes_recibidos;
 
   class Datos; /* FW */
 
