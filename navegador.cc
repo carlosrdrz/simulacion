@@ -56,3 +56,21 @@ NavegadorHelper::~NavegadorHelper()
 {
 
 }
+
+ApplicationContainer NavegadorHelper::Install(NodeContainer c)const
+{
+  ApplicationContainer appCont = OnOffHelper::Install(c);
+  for (ApplicationContainer::Iterator i = appCont.Begin (); i != appCont.End (); ++i)
+  {
+    Ptr<OnOffApplication> app = DynamicCast<OnOffApplication,Application>(*i);
+    //if(app)
+      //app->GetSocket()->SetRecvCallback (MakeCallback (&NavegadorHelper::RecibePaquete, NULL));
+  }
+  return appCont;
+}
+
+void NavegadorHelper::RecibePaquete (Ptr<Socket> socket)
+{
+  // NS_LOG_FUNCTION (this << socket);
+  // Do nothing
+}

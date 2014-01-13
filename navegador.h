@@ -25,11 +25,16 @@ class NavegadorHelper : public OnOffHelper
 public:
 	
   NavegadorHelper (Ipv4Address address, uint16_t port);
-  ~NavegadorHelper ();
+  ~NavegadorHelper();
 
+  ApplicationContainer Install(NodeContainer c)const;
 private:
   //Declaración de variables uniformes aleatorias
   //para ajustar Ton y Toff
   Ptr<UniformRandomVariable> varon;
   Ptr<UniformRandomVariable> varoff;
+
+  // virtual void StartApplication  (void);
+
+  void RecibePaquete (Ptr<Socket> socket);
 };
