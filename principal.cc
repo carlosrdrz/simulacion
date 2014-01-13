@@ -31,8 +31,8 @@ main ( int argc, char * argv[])
   Config::SetDefault ("ns3::CsmaNetDevice::EncapsulationMode", StringValue ("Dix"));
 
   bool tracing              = true;
-  unsigned nodos_acceso_1   = 2;
-  unsigned nodos_acceso_2   = 2;
+  unsigned nodos_acceso     = 2;
+  unsigned nodos_empresa    = 2;
   unsigned nodos_wifi       = 1;
   double distance           = 50.0;
   std::string data_rate_1   = "5Mbps";
@@ -49,11 +49,13 @@ main ( int argc, char * argv[])
   Average<double> acumulador_uso;  
   double intervalo          = 0;
   // Puertos
-  uint16_t sink_port = 8421;
+  uint16_t udp_port = 8421;
+  uint16_t tcp_port = 80;
+  //uint16_t ftp_port = 20;
 
   CommandLine cmd;
-  cmd.AddValue("NumeroNodosAcceso1", "Número de nodos en la red de acceso 1", nodos_acceso_1);
-  cmd.AddValue("NumeroNodosAcceso2", "Número de nodos en la red de acceso 2", nodos_acceso_2);
+  cmd.AddValue("NumeroNodosAcceso", "Número de nodos en la red de acceso 1", nodos_acceso);
+  cmd.AddValue("NumeroNodosEmpresa", "Número de nodos en la red de la empresa", nodos_empresa);
   cmd.AddValue("NumeroNodosWifi",    "Número de nodos que usan wifi",         nodos_wifi);
   cmd.AddValue("DataRate1",          "Capacidad de la red de acceso 1",       data_rate_1);
   cmd.AddValue("DataRate2",          "Capacidad de la red de acceso 2",       data_rate_2);
@@ -63,12 +65,13 @@ main ( int argc, char * argv[])
   cmd.AddValue("Delayt",             "Retardo de la red troncal",             delay_t);
   cmd.Parse (argc, argv);
 
+//for(nodos_acceso = 2; nodos_acceso = 5; nodos_acceso++)
+ //{
   for(tasa_errores = 0.1; tasa_errores <= 0.3; tasa_errores += 0.1)
   {
-    //acumulador_uso.Reset ();
+    acumulador_uso.Reset ();
     for (indice = 0; indice <= 1; indice++)
     {
-      acumulador_uso.Reset();
       // Variables del sistema
       Trazas traza;
       Topologia topologia;
@@ -76,8 +79,8 @@ main ( int argc, char * argv[])
       // Añadimos los contenedores de nodos
       NS_LOG_INFO ("Creando Topologia");
       topologia.AddContainer ("troncal", 2);
-      topologia.AddContainer ("acceso", nodos_acceso_1);
-      topologia.AddContainer ("empresa", nodos_acceso_2);
+      topologia.AddContainer ("acceso", nodos_acceso);
+      topologia.AddContainer ("empresa", nodos_empresa);
       topologia.AddContainer ("wifi", nodos_wifi);
 
       // Añadimos los routers para formar las subredes
@@ -112,12 +115,12 @@ main ( int argc, char * argv[])
       traza.Monitorize ("r1", topologia.GetNetDevice("troncal", 1));
 
       // Añadimos los modelos de errores
-      topologia.SetErrorModel("troncal", 0.1);
+      topologia.SetErrorModel("troncal", tasa_errores);
 
       // Comenzamos a añadir aplicaciones...
       // Sumideros
-      PacketSinkHelper sinkTcp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
-      PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
+      PacketSinkHelper sinkTcp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), tcp_port)));
+      PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), udp_port)));
   
       ApplicationContainer sink1 = sinkTcp.Install (topologia.GetNode("empresa", 0));
       sink1.Start (Seconds (1.0));
@@ -128,25 +131,25 @@ main ( int argc, char * argv[])
       sink2.Stop (Seconds (10.0));
 
       // Navegador
-      NavegadorHelper chrome (topologia.GetIPv4Address("empresa", 1), sink_port);
+      NavegadorHelper chrome (topologia.GetIPv4Address("empresa", 0), tcp_port);
       // Se instala la aplicación navegador
-      ApplicationContainer navegador = chrome.Install (topologia.GetNode("acceso", 0));
+      ApplicationContainer navegador = chrome.Install (topologia.GetNode("acceso", 1));
       navegador.Start (Seconds (1.0));
       navegador.Stop (Seconds (10.0));
   
       // Telefono IP
-      VoipHelper ciscoPhone (topologia.GetIPv4Address("empresa", 0), sink_port);
+      VoipHelper ciscoPhone (topologia.GetIPv4Address("empresa", 0), udp_port);
       ApplicationContainer app_voip = ciscoPhone.Install (topologia.GetNode("acceso", 0));
       // Se instala la aplicacion Voip
       app_voip.Start (Seconds (1.0));
       app_voip.Stop (Seconds (10.0));
    
       // Transferencia fichero
-      TransferenciaHelper ftp (topologia.GetIPv4Address("empresa", 1), sink_port);
+     // TransferenciaHelper ftp (topologia.GetIPv4Address("empresa", 1), tcp_port);
       // Se instala la aplicación transferencia
-      ApplicationContainer transferencia = ftp.Install (topologia.GetNode("acceso", 0));
-      transferencia.Start (Seconds(1.0));
-      transferencia.Stop (Seconds(10.0));
+      //ApplicationContainer transferencia = ftp.Install (topologia.GetNode("acceso", 0));
+      //transferencia.Start (Seconds(1.0));
+      //transferencia.Stop (Seconds(10.0));
 
       // Activamos la creacion de archivos PCAPs
       if(tracing) {
@@ -166,4 +169,5 @@ main ( int argc, char * argv[])
       intervalo = sqrt(acumulador_uso.Var() / NUM_SIMULACIONES) * TSTUDENT;
       NS_LOG_INFO ("El intervalo de confianza es" << intervalo);
   }
+ //}
 }
