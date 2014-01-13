@@ -12,6 +12,8 @@
 #include "transferencia.h"
 #include "voip.h"
 
+#include "servidor.h"
+
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("Principal");
@@ -104,9 +106,11 @@ main ( int argc, char * argv[])
   PacketSinkHelper sinkTcp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
   PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
   
-  ApplicationContainer sink1 = sinkTcp.Install (topologia.GetNode("empresa", 0));
-  sink1.Start (Seconds (1.0));
-  sink1.Stop (Seconds (10.0));
+  // ApplicationContainer sink1 = sinkTcp.Install (topologia.GetNode("empresa", 1));
+  // sink1.Start (Seconds (1.0));
+  // sink1.Stop (Seconds (10.0));
+
+  Servidor servidor(topologia.GetNode("empresa", 1)); //.AddApplication(Servidor);
 
   // ApplicationContainer sink2 = sinkUdp.Install (topologia.GetNode("empresa", 0)); 
   // sink2.Start (Seconds (1.0));

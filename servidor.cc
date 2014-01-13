@@ -9,32 +9,8 @@ NS_LOG_COMPONENT_DEFINE ("Servidor");
 Servidor::Servidor(Ptr< Node > disp)
 :Application(),m_node(PeekPointer(disp))
 {
-  //m_node = disp.Copy();
   DoInitialize();
 }
-
-#if 0
- void
-Servidor::StartApplication (void)
-{
- NS_LOG_FUNCTION (this);
-
- m_socket = Socket::CreateSocket (GetNode (), TypeId::LookupByName ("ns3::TcpSocketFactory"));
- NS_ASSERT (m_socket != 0);
- // m_socket->SetAttribute ("Protocol", UintegerValue (6)); // tcp
- m_socket->SetRecvCallback (MakeCallback (&Servidor::RecibePaquete, this));
- InetSocketAddress src = InetSocketAddress (Ipv4Address::GetAny (), 0);
- int status;
- status = m_socket->Bind (src);
- NS_ASSERT (status != -1);
-
- // InetSocketAddress dst = InetSocketAddress (m_remote, 0);
- // status = m_socket->Connect (dst);
- // NS_ASSERT (status != -1);
-
- // Send ();
-}
-#endif
 
 /// Recibe la petición web. Se asume que es válida siempre.
 void Servidor::RecibePaquete (Ptr<Socket> socket)
@@ -48,22 +24,23 @@ void Servidor::RecibePaquete (Ptr<Socket> socket)
 		NS_ASSERT (InetSocketAddress::IsMatchingType (from));
 		InetSocketAddress realFrom = InetSocketAddress::ConvertFrom (from);
 		NS_ASSERT (realFrom.GetPort ()); // assure port 80 or 443
-		// Just if we want do stuff with this
-		// Ipv4Header ipv4;
-		// p->RemoveHeader (ipv4);
-		// uint32_t recvSize = p->GetSize ();
-		// NS_ASSERT (ipv4.GetProtocol () == 6); // protocol should be tcp.
-		// TcpHeader tcp; // If we want do stuufs
-		// p->RemoveHeader (tcp);
 
 		RespondePaquete(realFrom.GetIpv4());
 	}
+}
+
+void Servidor::AceptaConexion (Ptr<Socket> s, const Address& from)
+{
+	NS_LOG_FUNCTION (this << s << from);
+	s->SetRecvCallback (MakeCallback (&Servidor::RecibePaquete, this));
+	m_socketList.push_back (s);
 }
 
 /// Método que envía un nuevo paquete.
 /// Deberá iniciar el temporizador de retransmisiones
 void Servidor::RespondePaquete(const Ipv4Address &desde)
 {
+	NS_LOG_FUNCTION(this << desde);
 	const char cadena_prueba[] = "hola";
 	Ptr<Packet> paquetePrueba = new Packet((uint8_t *)cadena_prueba,strlen(cadena_prueba),true);
 	//Ptr<Packet> enviar = new Packet(1); // TODO Tamaño aleatorio
@@ -79,22 +56,17 @@ void Servidor::DoInitialize()
  m_socket = Socket::CreateSocket (m_node, TypeId::LookupByName ("ns3::TcpSocketFactory"));
  NS_ASSERT (m_socket != 0);
  // m_socket->SetAttribute ("Protocol", UintegerValue (6)); // tcp
- m_socket->SetRecvCallback (MakeCallback (&Servidor::RecibePaquete, this));
- InetSocketAddress src = InetSocketAddress (Ipv4Address::GetAny (), 0);
+
+ InetSocketAddress src = InetSocketAddress (Ipv4Address::GetAny (), 8421);
  int status;
  status = m_socket->Bind (src);
  NS_ASSERT (status != -1);
  status = m_socket->Listen();
+ 
+ m_socket->SetRecvCallback (MakeCallback (&Servidor::RecibePaquete, this));
+ m_socket->SetAcceptCallback (
+  MakeNullCallback<bool, Ptr<Socket>, const Address &> (),
+  MakeCallback (&Servidor::AceptaConexion, this));
 
- // InetSocketAddress dst = InetSocketAddress (m_remote, 0);
- // status = m_socket->Connect (dst);
- // NS_ASSERT (status != -1);
-
- // Send ();
-
-  //GetNode()->RegisterProtocolHandler (ns3::MakeCallback(&Servidor::RecibePaquete,
-  //                                                     this),
-  //                                   0x0800, 0, false);
-//
   Application::DoInitialize();
 }

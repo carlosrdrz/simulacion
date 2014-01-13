@@ -22,12 +22,14 @@ public:
   // Método que envía un nuevo paquete.
   void RespondePaquete(const ns3::Ipv4Address &desde);
 
+  void AceptaConexion (ns3::Ptr<ns3::Socket> s, const ns3::Address& from);
+
   // void StartApplication (void);
   
   // Método de inicialización de la aplicación. Instala el Callback.
   void DoInitialize();
 private:
   ns3::Ptr< ns3::Node > m_node;
-
   ns3::Ptr<ns3::Socket> m_socket;
+  std::list<ns3::Ptr<ns3::Socket> > m_socketList; 
 };
