@@ -21,6 +21,7 @@
 
 #define OCTETO 8 
 #define POR_CIENTO 100
+#define VACIO 0
 
 using namespace std;
 using namespace ns3;
