@@ -45,7 +45,7 @@ void Servidor::RespondePaquete(const Ipv4Address &desde)
 	//Ptr<Packet> paquetePrueba = new Packet((uint8_t *)cadena_prueba,strlen(cadena_prueba),true);
 	Ptr<Packet> enviar = new Packet(1000); // TODO Tamaño aleatorio
 	
-	m_socket->SendTo(enviar,0,desde);
+	// m_socket->SendTo(enviar,0,desde);
 }
 
 // Método de inicialización de la aplicación. Instala el Callback.

@@ -25,10 +25,12 @@ main ( int argc, char * argv[])
   LogComponentEnable("Trazas", LOG_LEVEL_INFO);
   LogComponentEnable("Topologia", LOG_LEVEL_INFO);
   LogComponentEnable("Principal", LOG_LEVEL_INFO);
-  // LogComponentEnable("Trazas", LOG_LEVEL_ALL);
+  LogComponentEnable("Trazas", LOG_LEVEL_ALL);
+  LogComponentEnable("Servidor", LOG_LEVEL_ALL);
 
   Config::SetDefault ("ns3::CsmaNetDevice::EncapsulationMode", StringValue ("Dix"));
 
+  float tiempoSimulacion    = 50;
   bool tracing              = true;
   unsigned nodos_acceso_1   = 2;
   unsigned nodos_acceso_2   = 2;
@@ -99,12 +101,12 @@ main ( int argc, char * argv[])
   traza.Monitorize ("r1", topologia.GetNetDevice("troncal", 1));
 
   // Añadimos los modelos de errores
-  topologia.SetErrorModel("troncal", 0.1);
+  topologia.SetErrorModel("troncal", 0);
 
   // Comenzamos a añadir aplicaciones...
   // Sumideros
-  PacketSinkHelper sinkTcp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
-  PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
+  // PacketSinkHelper sinkTcp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
+  // PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
   
   // ApplicationContainer sink1 = sinkTcp.Install (topologia.GetNode("empresa", 1));
   // sink1.Start (Seconds (1.0));
@@ -121,7 +123,7 @@ main ( int argc, char * argv[])
   // Se instala la aplicación navegador
   ApplicationContainer navegador = chrome.Install (topologia.GetNode("acceso", 0));
   navegador.Start (Seconds (1.0));
-  navegador.Stop (Seconds (10.0));
+  navegador.Stop (Seconds (tiempoSimulacion));
   
   // Telefono IP
   //VoipHelper ciscoPhone (topologia.GetIPv4Address("empresa", 0), sink_port);
@@ -144,6 +146,7 @@ main ( int argc, char * argv[])
   }
 
   NS_LOG_INFO ("Ejecutando simulacion...");
+  Simulator::Stop (Seconds (tiempoSimulacion));
   Simulator::Run();
 
   // Imprimimos todas las trazas monitorizadas

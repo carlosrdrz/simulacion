@@ -27,7 +27,7 @@ public:
   NavegadorHelper (Ipv4Address address, uint16_t port);
   ~NavegadorHelper();
 
-  ApplicationContainer Install(NodeContainer c)const;
+  ApplicationContainer Install(NodeContainer c);
 private:
   //Declaración de variables uniformes aleatorias
   //para ajustar Ton y Toff

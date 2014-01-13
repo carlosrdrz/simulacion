@@ -57,14 +57,14 @@ NavegadorHelper::~NavegadorHelper()
 
 }
 
-ApplicationContainer NavegadorHelper::Install(NodeContainer c)const
+ApplicationContainer NavegadorHelper::Install(NodeContainer c)
 {
   ApplicationContainer appCont = OnOffHelper::Install(c);
   for (ApplicationContainer::Iterator i = appCont.Begin (); i != appCont.End (); ++i)
   {
     Ptr<OnOffApplication> app = DynamicCast<OnOffApplication,Application>(*i);
     //if(app)
-      //app->GetSocket()->SetRecvCallback (MakeCallback (&NavegadorHelper::RecibePaquete, NULL));
+      // app->GetSocket()->SetRecvCallback (MakeCallback (&NavegadorHelper::RecibePaquete, this));
   }
   return appCont;
 }
