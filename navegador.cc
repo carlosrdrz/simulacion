@@ -18,6 +18,8 @@
 #include "navegador.h"
 using namespace ns3;
 
+NS_LOG_COMPONENT_DEFINE("Navegador");
+
 #define MAXONNAV 0.4
 #define MINONNAV 0.2
 #define MAXOFFNAV 0.8
@@ -27,6 +29,7 @@ using namespace ns3;
 NavegadorHelper::NavegadorHelper(Ipv4Address address, uint16_t port)
   :OnOffHelper("ns3::TcpSocketFactory", Address (InetSocketAddress (address,port)))
 { 
+  NS_LOG_FUNCTION(this);
   //Variable para TON
   varon = CreateObject <UniformRandomVariable>();
   varon->SetAttribute("Max", DoubleValue(MAXONNAV));
