@@ -42,9 +42,6 @@ NavegadorHelper::NavegadorHelper(Ipv4Address address, uint16_t port)
   SetConstantRate (DataRate ("500kb/s"));
   SetAttribute("OnTime", PointerValue(varon));
   SetAttribute("OffTime", PointerValue(varoff));
-
-  //std::cout<<"Valor de OnTime: "<<varon->GetValue()<<std::endl;
-  //std::cout<<"Valor de OffTime: "<<varoff->GetValue()<<std::endl;
 }
 NavegadorHelper::~NavegadorHelper()
 {
