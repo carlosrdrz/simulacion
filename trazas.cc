@@ -109,15 +109,9 @@ Trazas::ImprimeTrazas(double tasa, double tiempo_total)
   for (std::map<std::string,Datos*>::const_iterator it=valores.begin(); it!=valores.end(); ++it) {
     const std::string id = it->first;
     total_bytes_recibidos+=GetBytesRecibidos(id);
-  }
-  
-  std::cout << "Rendimiento del canal previo: " << rendimiento << std::endl;
-  std::cout << "Total de bytes recibidos: " << total_bytes_recibidos << std::endl;
-  std::cout << "Tasa: " << tasa << std::endl;
-  std::cout << "Tiempo total: " << tiempo_total << std::endl;
-  
+  } 
   rendimiento=(total_bytes_recibidos*OCTETO)/(tasa*tiempo_total);
-  std::cout << "Rendimiento del canal posterior: " << rendimiento << std::endl;
+  std::cout << "Rendimiento del canal: " << rendimiento << std::endl;
   return rendimiento*POR_CIENTO;
 }
 //#endif
