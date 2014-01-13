@@ -14,8 +14,9 @@
 
 #define TSTUDENT 1.8331               //10 Simulaciones con 90% de intervalo de confianza
 #define NUM_SIMULACIONES 10
-
-
+#define TASA 5000000
+#define T_INICIO 1
+#define T_FINAL 10
 
 
 using namespace ns3;
@@ -44,8 +45,8 @@ main ( int argc, char * argv[])
   std::string delay_t       = "0.002";
   float tasa_errores        = 0;        
   int indice                = 0;   
-  double tasa               = 5000000;
-  double tiempo             = 9;
+  double tasa               = TASA;
+  double tiempo             = T_FINAL-T_INICIO;
   double uso_enlace         = 0;      //Porcentaje de uso del enlace que devolverá el método ImprimeTrazas
   Average<double> acumulador_uso;  
   double intervalo          = 0;
@@ -121,33 +122,33 @@ main ( int argc, char * argv[])
       PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), sink_port)));
   
       ApplicationContainer sink1 = sinkTcp.Install (topologia.GetNode("empresa", 0));
-      sink1.Start (Seconds (1.0));
-      sink1.Stop (Seconds (10.0));
+      sink1.Start (Seconds (T_INICIO));
+      sink1.Stop (Seconds (T_FINAL));
 
       ApplicationContainer sink2 = sinkUdp.Install (topologia.GetNode("empresa", 0)); 
-      sink2.Start (Seconds (1.0));
-      sink2.Stop (Seconds (10.0));
+      sink2.Start (Seconds (T_INICIO));
+      sink2.Stop (Seconds (T_FINAL));
 
       // Navegador
       NavegadorHelper chrome (topologia.GetIPv4Address("empresa", 1), sink_port);
       // Se instala la aplicación navegador
       ApplicationContainer navegador = chrome.Install (topologia.GetNode("acceso", 0));
-      navegador.Start (Seconds (1.0));
-      navegador.Stop (Seconds (10.0));
+      navegador.Start (Seconds (T_INICIO));
+      navegador.Stop (Seconds (T_FINAL));
   
       // Telefono IP
       VoipHelper ciscoPhone (topologia.GetIPv4Address("empresa", 0), sink_port);
       ApplicationContainer app_voip = ciscoPhone.Install (topologia.GetNode("acceso", 0));
       // Se instala la aplicacion Voip
-      app_voip.Start (Seconds (1.0));
-      app_voip.Stop (Seconds (10.0));
+      app_voip.Start (Seconds (T_INICIO));
+      app_voip.Stop (Seconds (T_FINAL));
    
       // Transferencia fichero
       TransferenciaHelper ftp (topologia.GetIPv4Address("empresa", 1), sink_port);
       // Se instala la aplicación transferencia
       ApplicationContainer transferencia = ftp.Install (topologia.GetNode("acceso", 0));
-      transferencia.Start (Seconds(1.0));
-      transferencia.Stop (Seconds(10.0));
+      transferencia.Start (Seconds(T_INICIO));
+      transferencia.Stop (Seconds(T_FINAL));
 
       // Activamos la creacion de archivos PCAPs
       if(tracing) {
