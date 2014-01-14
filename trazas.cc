@@ -114,7 +114,7 @@ Trazas::ImprimeTrazas(double tasa, double tiempo_total)
     total_bytes_perdidos+=GetBytesPerdidos(id);
     total_bytes_enviados+=GetBytesEnviados(id);
   } 
-  uso_enlace=((total_bytes_enviados)*OCTETO)/(tasa*tiempo_total);
+  uso_enlace=(total_bytes_enviados*OCTETO)/(tasa*tiempo_total);
   return uso_enlace*POR_CIENTO;
 }
 //#endif

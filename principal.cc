@@ -69,11 +69,11 @@ main ( int argc, char * argv[])
   cmd.AddValue("Delayt",             "Retardo de la red troncal",               delay_t);
   cmd.Parse (argc, argv);
 
-for(nodos_acceso = 5; nodos_acceso <= 5; nodos_acceso+=5)
+for(nodos_acceso = 3; nodos_acceso <= 15; nodos_acceso+=3)
  {
   NS_LOG_INFO("El número de usuarios que acceden es: " << nodos_acceso);
   nodos_wifi = nodos_acceso;
-  for(tasa_errores = 0.1; tasa_errores <= 0.5; tasa_errores += 0.2)
+  for(tasa_errores = 0.01; tasa_errores <= 0.01; tasa_errores += 0.2)
   {
     NS_LOG_INFO("LA TASA DE ERRORES ES: " << tasa_errores);
     //Nombre variable del fichero de datos

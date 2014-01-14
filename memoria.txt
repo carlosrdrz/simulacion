@@ -43,3 +43,13 @@ Se han creado, partiendo de la aplicación on/off suministrada por ns3, los sigu
 * Trasferencia de ficheros
 * VoIP
 * Video de difusión
+
+3. Estudios realizados
+======================
+Se realizarán dos estudios:
+
+  - Disminución del uso del enlace aumentando la tasa de error: 
+
+  - Aumento del uso del enlace aumentando el número de aplicaciones en la red de acceso (aumento del número de nodos): se ha comprobado que un aumento en el número de usuarios que usan aplicaciones en la red de acceso produce un aumento en la ocupación del enlace, ya que el tráfico generado es mayor. Este aumento se produce hasta llegar a un límite en el número de usuarios, ya que como la red de acceso es csma, con un número excesivo de usuarios también se producirán un número mayor de colisiones, enviándose así menos paquetes.
+
+COMPLETAR ESA JUSTIFICACIÓN DE CSMA Y PONER POR QUÉ DISMINUYE EL USO AUMENTANDO LA TASA DE ERROR!
