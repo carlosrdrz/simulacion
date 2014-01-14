@@ -20,7 +20,7 @@ void Servidor::RecibePaquete (Ptr<Socket> socket)
         {
                 Address from;
                 Ptr<Packet> p = socket->RecvFrom (0xffffffff, 0, from);
-                NS_LOG_DEBUG ("recv " << p->GetSize () << " bytes");
+                //NS_LOG_DEBUG ("recv " << p->GetSize () << " bytes");
                 //NS_ASSERT (InetSocketAddress::IsMatchingType (from));
                 //InetSocketAddress realFrom = InetSocketAddress::ConvertFrom (from);
                 //NS_ASSERT (realFrom.GetPort ()); // assure port 80 or 443

@@ -25,7 +25,6 @@ class NavegadorHelper : public OnOffHelper
 public:
 	
   NavegadorHelper (Ipv4Address address, uint16_t port);
-  ~NavegadorHelper ();
 
 private:
   //Declaración de variables uniformes aleatorias
