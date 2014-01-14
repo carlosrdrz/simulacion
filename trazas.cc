@@ -102,19 +102,20 @@ Trazas::ImprimeTrazas(double tasa, double tiempo_total)
     std::cout << "Bytes recibidos por el dispositivo " << id << ": " << GetBytesRecibidos(id) << std::endl;
     std::cout << "Bytes perdidos por el dispositivo " << id << ": " << GetBytesPerdidos(id) << std::endl;   
   }
-  //Cálculo del rendimiento del enlace
+  //Cálculo del porcentaje de uso del enlace
   //Reiniciamos la variable de los bytes recibidos.
   total_bytes_recibidos=VACIO;
   total_bytes_perdidos=VACIO;
+  total_bytes_enviados=VACIO;
   //Sumamos todos los bytes recibidos por todos los nodos.
   for (std::map<std::string,Datos*>::const_iterator it=valores.begin(); it!=valores.end(); ++it) {
     const std::string id = it->first;
     total_bytes_recibidos+=GetBytesRecibidos(id);
     total_bytes_perdidos+=GetBytesPerdidos(id);
+    total_bytes_enviados+=GetBytesEnviados(id);
   } 
-  rendimiento=((total_bytes_recibidos-total_bytes_perdidos)*OCTETO)/(tasa*tiempo_total);
-  std::cout << "Rendimiento del canal: " << rendimiento << std::endl;
-  return rendimiento*POR_CIENTO;
+  uso_enlace=((total_bytes_enviados)*OCTETO)/(tasa*tiempo_total);
+  return uso_enlace*POR_CIENTO;
 }
 //#endif
 

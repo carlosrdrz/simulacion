@@ -11,13 +11,16 @@
 #include "navegador.h"
 #include "transferencia.h"
 #include "voip.h"
+#include "servidor.h"
 
 #define TSTUDENT 1.8331               //10 Simulaciones con 90% de intervalo de confianza
 #define NUM_SIMULACIONES 10
 #define TASA 5000000
 #define T_INICIO 1
 #define T_FINAL 10
-
+#define HTTP_PORT 80
+#define FTP_PORT 20
+#define VOIP_PORT 4569
 
 using namespace ns3;
 
@@ -33,8 +36,8 @@ main ( int argc, char * argv[])
   Config::SetDefault ("ns3::CsmaNetDevice::EncapsulationMode", StringValue ("Dix"));
 
   bool tracing              = true;
-  unsigned nodos_acceso     = 3;
-  unsigned nodos_empresa    = 2;
+  unsigned nodos_acceso     = 5;
+  unsigned nodos_empresa    = 3;
   unsigned nodos_wifi       = 1;
   double distance           = 50.0;
   std::string data_rate_1   = "5Mbps";
@@ -50,10 +53,6 @@ main ( int argc, char * argv[])
   double uso_enlace         = 0;      //Porcentaje de uso del enlace que devolverá el método ImprimeTrazas
   Average<double> acumulador_uso;  
   double intervalo          = 0;
-  // Puertos
-  uint16_t http_port        = 80;
-  uint16_t udp_port         = 16600;
-  uint16_t ftp_port         = 20;
   //Nombre BASE del fichero de datos de salida
   int numero_fichero        = 1;
   std::string nombre_archivo_datos = "trabajo_final";
@@ -64,15 +63,17 @@ main ( int argc, char * argv[])
   cmd.AddValue("NumeroNodosWifi",    "Número de nodos que usan wifi",         nodos_wifi);
   cmd.AddValue("DataRate1",          "Capacidad de la red de acceso 1",       data_rate_1);
   cmd.AddValue("DataRate2",          "Capacidad de la red de acceso 2",       data_rate_2);
-  cmd.AddValue("DataRatet",          "Capacidad de la red troncal",           data_rate_2);
+  cmd.AddValue("DataRatet",          "Capacidad de la red troncal",           data_rate_t);
   cmd.AddValue("Delay1",             "Retardo de la red de acceso 1",         delay_1);
   cmd.AddValue("Delay2",             "Retardo de la red de acceso 2",         delay_2);
   cmd.AddValue("Delayt",             "Retardo de la red troncal",             delay_t);
   cmd.Parse (argc, argv);
 
-//for(nodos_acceso = 2; nodos_acceso = 5; nodos_acceso++)
- //{
-  for(tasa_errores = 0.005; tasa_errores <= 0.005; tasa_errores += 0.005)
+for(nodos_acceso = 50; nodos_acceso <= 50; nodos_acceso+=5)
+ {
+  NS_LOG_INFO("El número de usuarios que acceden es: " << nodos_acceso);
+  nodos_wifi = nodos_acceso;
+  for(tasa_errores = 0.06; tasa_errores <= 0.06; tasa_errores += 0.05)
   {
     NS_LOG_INFO("LA TASA DE ERRORES ES: " << tasa_errores);
     //Nombre variable del fichero de datos
@@ -133,13 +134,10 @@ main ( int argc, char * argv[])
 
       // Comenzamos a añadir aplicaciones...
       // Sumideros
-      PacketSinkHelper sinkHttp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), http_port)));
-      PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), udp_port)));
-      PacketSinkHelper sinkFtp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), ftp_port)));
-  
-      ApplicationContainer sink1 = sinkHttp.Install (topologia.GetNode("empresa", 0));
-      sink1.Start (Seconds (T_INICIO));
-      sink1.Stop (Seconds (T_FINAL));
+      PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), VOIP_PORT)));
+      PacketSinkHelper sinkFtp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), FTP_PORT)));
+
+      Servidor servidor (topologia.GetNode("empresa", 2));  //Aplicación servidor HTTP
 
       ApplicationContainer sink2 = sinkUdp.Install (topologia.GetNode("empresa", 1)); 
       sink2.Start (Seconds (T_INICIO));
@@ -150,37 +148,38 @@ main ( int argc, char * argv[])
       sink3.Stop (Seconds (T_FINAL));
 
       // Navegador
-      NavegadorHelper chrome (topologia.GetIPv4Address("empresa", 0), http_port);
+      NavegadorHelper chrome (topologia.GetIPv4Address("empresa", 2), HTTP_PORT);
       // Se instala la aplicación navegador
-      ApplicationContainer navegador = chrome.Install (topologia.GetNode("acceso", 0));
+      ApplicationContainer navegador = chrome.Install (*(topologia.GetNodeContainer ("acceso")));
       navegador.Start (Seconds (T_INICIO));
       navegador.Stop (Seconds (T_FINAL));
       
       // Navegador wifi
-      NavegadorHelper safari (topologia.GetIPv4Address("empresa", 0), http_port);
+      NavegadorHelper safari (topologia.GetIPv4Address("empresa", 2), HTTP_PORT);
       // Se instala la aplicación navegador en un dispositivo con wifi
-      ApplicationContainer navegador_wifi = safari.Install (topologia.GetNode("wifi", 0));
+      ApplicationContainer navegador_wifi = safari.Install (*(topologia.GetNodeContainer ("wifi")));
       navegador_wifi.Start (Seconds (T_INICIO));
       navegador_wifi.Stop (Seconds (T_FINAL));
         
       // Telefono IP
-      VoipHelper ciscoPhone (topologia.GetIPv4Address("empresa", 1), udp_port);
-      ApplicationContainer app_voip = ciscoPhone.Install (topologia.GetNode("acceso", 2));
+      VoipHelper ciscoPhone (topologia.GetIPv4Address("empresa", 1), VOIP_PORT);
+      ApplicationContainer app_voip = ciscoPhone.Install (*(topologia.GetNodeContainer ("acceso")));
       // Se instala la aplicacion Voip
       app_voip.Start (Seconds (T_INICIO));
       app_voip.Stop (Seconds (T_FINAL));
    
       //Transferencia fichero
-      TransferenciaHelper ftp (topologia.GetIPv4Address("empresa", 0), ftp_port);
+      TransferenciaHelper ftp (topologia.GetIPv4Address("empresa", 0), FTP_PORT);
       // Se instala la aplicación transferencia
-      ApplicationContainer transferencia = ftp.Install (topologia.GetNode("acceso", 1));
+      ApplicationContainer transferencia = ftp.Install (*(topologia.GetNodeContainer ("acceso")));
       transferencia.Start (Seconds(T_INICIO));
       transferencia.Stop (Seconds(T_FINAL));
 
       // Activamos la creacion de archivos PCAPs
       if(tracing) {
-        topologia.EnablePCAPLogging ("acceso");
-        topologia.EnablePCAPLogging ("empresa");
+        //topologia.EnablePCAPLogging ("acceso");
+        //topologia.EnablePCAPLogging ("empresa");
+        topologia.EnablePCAPLogging ("troncal");
       }
 
       NS_LOG_INFO ("Ejecutando simulacion...");
@@ -197,6 +196,6 @@ main ( int argc, char * argv[])
       NS_LOG_INFO ("El intervalo de confianza es: " << intervalo);
       fichero << tasa_errores << " " << acumulador_uso.Mean() << " " << intervalo << std::endl;
   }
- //}
+ }
  return 0;
 }

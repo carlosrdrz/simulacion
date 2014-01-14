@@ -60,9 +60,10 @@ public:
 private:
 
   //double necesarios para obtener el rendimiento
-  double rendimiento;
+  double uso_enlace;
   double total_bytes_recibidos;
   double total_bytes_perdidos;
+  double total_bytes_enviados;
 
   class Datos; /* FW */
 
