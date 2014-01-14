@@ -27,7 +27,7 @@ public:
   ~VoipHelper ();
 
 private:
-  Ptr<ConstantRandomVariable> varon;
-  Ptr<ConstantRandomVariable> varoff;
+  Ptr<UniformRandomVariable> varon;
+  Ptr<UniformRandomVariable> varoff;
 
 };
