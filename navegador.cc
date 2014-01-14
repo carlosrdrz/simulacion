@@ -22,8 +22,8 @@ NS_LOG_COMPONENT_DEFINE("Navegador");
 
 #define MAXONNAV 0.4
 #define MINONNAV 0.2
-#define MAXOFFNAV 0.8
-#define MINOFFNAV 0.6
+#define MAXOFFNAV 15
+#define MINOFFNAV 8
 
 //antiguamente: const char *address
 NavegadorHelper::NavegadorHelper(Ipv4Address address, uint16_t port)
@@ -39,11 +39,7 @@ NavegadorHelper::NavegadorHelper(Ipv4Address address, uint16_t port)
   varoff->SetAttribute("Max", DoubleValue(MAXOFFNAV));
   varoff->SetAttribute("Min", DoubleValue(MINOFFNAV));
  
-  SetConstantRate (DataRate ("500kb/s"));
+  SetConstantRate (DataRate ("100Mbps"));
   SetAttribute("OnTime", PointerValue(varon));
   SetAttribute("OffTime", PointerValue(varoff));
-}
-NavegadorHelper::~NavegadorHelper()
-{
-
 }
