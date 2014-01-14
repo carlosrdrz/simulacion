@@ -5,7 +5,7 @@
 
 Se pretende crear la siguiente estructura:
 
-|   cacceso1    |           | cacceso2  |
+|   empresa     |           |  acceso  |
 
 =================           =============
 |       |       |           |     |     |
