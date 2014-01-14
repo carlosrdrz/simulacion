@@ -18,8 +18,11 @@
 #include "ns3/internet-module.h"
 #include "voip.h"
 using namespace ns3;
-#define ONTIMEVOIP 0.6
-#define OFFTIMEVOIP 0.2
+#define MAXONVOIP 0.1
+#define MINONVOIP 0.2
+#define MAXOFFVOIP 0.8
+#define MINOFFVOIP 0.9
+
 /*
   Constructor de la clase Voip.
   Hereda el constructor de OnOffHelper
@@ -31,10 +34,12 @@ VoipHelper::VoipHelper(Ipv4Address address, uint16_t port)
   :OnOffHelper("ns3::UdpSocketFactory", Address (InetSocketAddress (address,port)))
 {
   //Creamos las variables aleatorias para fijar On/Off Time
-  varon=CreateObject<ConstantRandomVariable>();
-  varoff=CreateObject<ConstantRandomVariable>();
-  varon->SetAttribute("Constant", DoubleValue(ONTIMEVOIP));
-  varoff->SetAttribute("Constant", DoubleValue(OFFTIMEVOIP));
+  varon=CreateObject<UniformRandomVariable>();
+  varon->SetAttribute("Max", DoubleValue(MAXONVOIP));
+  varon->SetAttribute("Min", DoubleValue(MINONVOIP));
+  varoff=CreateObject<UniformRandomVariable>();
+  varoff->SetAttribute("Max", DoubleValue(MAXOFFVOIP));
+  varoff->SetAttribute("Min", DoubleValue(MINOFFVOIP));
   //Configuramos la aplicación OnOff
   SetConstantRate (DataRate ("500kb/s"));
   SetAttribute("OnTime", PointerValue(varon));
