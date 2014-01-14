@@ -38,18 +38,34 @@ a cada una de ellas características individuales:
 
 2.3 Aplicaciones
 ----------------
-Se han creado, partiendo de la aplicación on/off suministrada por ns3, los siguientes aplicaciones
-* Navegador web
-* Trasferencia de ficheros
-* VoIP
-* Video de difusión
+Se han creado, partiendo de la aplicación on/off suministrada por ns3, los siguientes aplicaciones. 
+* Navegador web: Aplicación que espera una conexión TCP entrante y, cuando ésta llega, 
+  le devuelve un paquete de un tamaño fijo, simulando la página web.
+* Trasferencia de ficheros: Envío de paquetes vía TCP de un equipo a otro
+* VoIP: Envío de datagramas UDP de un equipo a otro, uno cada 125ms.
+* Video de difusión: Envío de paquetes datagramas de difusión.
 
 3. Estudios realizados
 ======================
 Se realizarán dos estudios:
 
-  - Disminución del uso del enlace aumentando la tasa de error: para esta prueba se pondrá un número de usuarios fijo.
+3.1 Disminución del uso del enlace aumentando la tasa de error
+--------------------------------------------------------------
+Fijando el número de usuarios, variamos la tasa de error y comprobamos el efecto en el uso del 
+enlace. Se observa que disminuye el uso del canal, debido a las esperas que realizan los
+nodos para la retransmisión TCP.
 
-  - Aumento del uso del enlace aumentando el número de aplicaciones en la red de acceso (aumento del número de nodos): para esta prueba se pondrá una tasa de error fija. Se ha comprobado que un aumento en el número de usuarios que usan aplicaciones en la red de acceso produce un aumento en la ocupación del enlace, ya que el tráfico generado es mayor. Este aumento se produce hasta llegar a un límite en el número de usuarios, ya que como la red de acceso es csma, con un número excesivo de usuarios también se producirán un número mayor de colisiones, enviándose así menos paquetes.
+3.2 Aumento del uso del enlace aumentando el número de aplicaciones en la red de acceso
+---------------------------------------------------------------------------------------
+Fijando tasa de error, se incrementa el número de nodos en los extremos de la red. Se 
+ha comprobado que un aumento en el número de usuarios que usan aplicaciones en la red de 
+acceso produce un aumento en la ocupación del enlace, ya que el tráfico generado es mayor, 
+Este aumento se produce hasta llegar a un límite en el número de usuarios (saturación).
 
-COMPLETAR ESA JUSTIFICACIÓN DE CSMA Y PONER POR QUÉ DISMINUYE EL USO AUMENTANDO LA TASA DE ERROR!
+Se observa un límite bajo debido a que las redes extremos son CSMA, y antes de alcanzar la
+red troncal los nodos deben competir entre ellos para alcanzar los routers de acceso. Si
+la red fuese conmutada, se formarían colas de paquetes haciendo mayor la ocupación del 
+canal y, por tanto, consiguiendo un envío más eficiente.
+
+
+
