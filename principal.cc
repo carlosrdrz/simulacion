@@ -1,4 +1,3 @@
-#if 0
 /*
   Fichero: principal.cc
   Descripción: aquí se implementará el main
@@ -211,4 +210,3 @@ for(nodos_acceso = 3; nodos_acceso <= 15; nodos_acceso+=3)
  }
  return 0;
 }
-#endif
