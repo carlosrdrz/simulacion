@@ -33,7 +33,7 @@ main ( int argc, char * argv[])
   Config::SetDefault ("ns3::CsmaNetDevice::EncapsulationMode", StringValue ("Dix"));
 
   bool tracing              = true;
-  unsigned nodos_acceso     = 2;
+  unsigned nodos_acceso     = 3;
   unsigned nodos_empresa    = 2;
   unsigned nodos_wifi       = 1;
   double distance           = 50.0;
@@ -51,10 +51,9 @@ main ( int argc, char * argv[])
   Average<double> acumulador_uso;  
   double intervalo          = 0;
   // Puertos
-  uint16_t http_port        = 16500;
+  uint16_t http_port        = 80;
   uint16_t udp_port         = 16600;
-  uint16_t ftp_port         = 16700;
-  uint16_t http_wifi_port   = 16800;
+  uint16_t ftp_port         = 20;
 
   CommandLine cmd;
   cmd.AddValue("NumeroNodosAcceso",  "Número de nodos en la red de acceso 1", nodos_acceso);
@@ -70,11 +69,11 @@ main ( int argc, char * argv[])
 
 //for(nodos_acceso = 2; nodos_acceso = 5; nodos_acceso++)
  //{
-  for(tasa_errores = 0.005; tasa_errores <= 0.015; tasa_errores += 0.005)
+  for(tasa_errores = 0.005; tasa_errores <= 0.005; tasa_errores += 0.005)
   {
     NS_LOG_INFO("LA TASA DE ERRORES ES: " << tasa_errores);
     acumulador_uso.Reset ();
-    for (indice = 0; indice <= NUM_SIMULACIONES; indice++)
+    for (indice = 0; indice <= 1; indice++)
     {
       // Variables del sistema
       Trazas traza;
@@ -123,10 +122,9 @@ main ( int argc, char * argv[])
 
       // Comenzamos a añadir aplicaciones...
       // Sumideros
-      PacketSinkHelper sinkHttp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), ++http_port)));
-      PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), ++udp_port)));
-      PacketSinkHelper sinkFtp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), ++ftp_port)));
-      PacketSinkHelper sinkWifi ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), ++http_wifi_port)));
+      PacketSinkHelper sinkHttp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), http_port)));
+      PacketSinkHelper sinkUdp ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), udp_port)));
+      PacketSinkHelper sinkFtp ("ns3::TcpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny(), ftp_port)));
   
       ApplicationContainer sink1 = sinkHttp.Install (topologia.GetNode("empresa", 0));
       sink1.Start (Seconds (T_INICIO));
@@ -140,10 +138,6 @@ main ( int argc, char * argv[])
       sink3.Start (Seconds (T_INICIO));
       sink3.Stop (Seconds (T_FINAL));
 
-      ApplicationContainer sink4 = sinkWifi.Install (topologia.GetNode("empresa", 0));
-      sink3.Start (Seconds (T_INICIO));
-      sink3.Stop (Seconds (T_FINAL));
-
       // Navegador
       NavegadorHelper chrome (topologia.GetIPv4Address("empresa", 0), http_port);
       // Se instala la aplicación navegador
@@ -152,7 +146,7 @@ main ( int argc, char * argv[])
       navegador.Stop (Seconds (T_FINAL));
       
       // Navegador wifi
-      NavegadorHelper safari (topologia.GetIPv4Address("empresa", 0), http_wifi_port);
+      NavegadorHelper safari (topologia.GetIPv4Address("empresa", 0), http_port);
       // Se instala la aplicación navegador en un dispositivo con wifi
       ApplicationContainer navegador_wifi = safari.Install (topologia.GetNode("wifi", 0));
       navegador_wifi.Start (Seconds (T_INICIO));
@@ -160,7 +154,7 @@ main ( int argc, char * argv[])
         
       // Telefono IP
       VoipHelper ciscoPhone (topologia.GetIPv4Address("empresa", 1), udp_port);
-      ApplicationContainer app_voip = ciscoPhone.Install (topologia.GetNode("acceso", 1));
+      ApplicationContainer app_voip = ciscoPhone.Install (topologia.GetNode("acceso", 2));
       // Se instala la aplicacion Voip
       app_voip.Start (Seconds (T_INICIO));
       app_voip.Stop (Seconds (T_FINAL));
@@ -168,7 +162,7 @@ main ( int argc, char * argv[])
       //Transferencia fichero
       TransferenciaHelper ftp (topologia.GetIPv4Address("empresa", 0), ftp_port);
       // Se instala la aplicación transferencia
-      ApplicationContainer transferencia = ftp.Install (topologia.GetNode("acceso", 0));
+      ApplicationContainer transferencia = ftp.Install (topologia.GetNode("acceso", 1));
       transferencia.Start (Seconds(T_INICIO));
       transferencia.Stop (Seconds(T_FINAL));
 
@@ -179,6 +173,7 @@ main ( int argc, char * argv[])
       }
 
       NS_LOG_INFO ("Ejecutando simulacion...");
+      Simulator::Stop(Seconds(T_FINAL));
       Simulator::Run();
       // Imprimimos todas las trazas monitorizadas
       uso_enlace = traza.ImprimeTrazas(tasa,tiempo); 
