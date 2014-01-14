@@ -1,4 +1,4 @@
-#if 0
+
 /*
   Fichero: principal.cc
   Descripción: aquí se implementará el main
@@ -17,7 +17,7 @@
 #define NUM_SIMULACIONES 10
 #define TASA 5000000
 #define T_INICIO 1
-#define T_FINAL 30
+#define T_FINAL 10
 #define HTTP_PORT 80
 #define FTP_PORT 20
 #define VOIP_PORT 4569
@@ -56,7 +56,7 @@ main ( int argc, char * argv[])
   double intervalo          = 0;
   //Nombre BASE del fichero de datos de salida
   int numero_fichero        = 1;
-  std::string nombre_archivo_datos = "trabajo_final";
+  std::string nombre_archivo_datos = "trabajo_final_errores";
   
   CommandLine cmd;
   cmd.AddValue("NumeroNodosAcceso",  "Número de nodos en la red de acceso 1",   nodos_acceso);
@@ -78,11 +78,11 @@ main ( int argc, char * argv[])
   std::string nombreFichero = nombre_archivo_datos + num + ".dat";
   std::ofstream fichero (nombreFichero.c_str(), std::ios_base::app);
 
-for(nodos_acceso = 3; nodos_acceso <= 15; nodos_acceso+=3)
+for(nodos_acceso = 6; nodos_acceso <= 6; nodos_acceso+=3)
  {
   nodos_wifi = nodos_acceso;
   NS_LOG_INFO("El número de usuarios que acceden es: " << nodos_acceso << " por CSMA, y " << nodos_wifi << " por wifi");
-  for(tasa_errores = 0; tasa_errores <= 0; tasa_errores += 0.1)
+  for(tasa_errores = 0.3; tasa_errores <= 0.3; tasa_errores += 0.1)
   {
     NS_LOG_INFO("LA TASA DE ERRORES ES: " << tasa_errores);
     //Nombre variable del fichero de datos
@@ -206,9 +206,8 @@ for(nodos_acceso = 3; nodos_acceso <= 15; nodos_acceso+=3)
     }
       intervalo = sqrt(acumulador_uso.Var() / NUM_SIMULACIONES) * TSTUDENT;
       NS_LOG_INFO ("El intervalo de confianza es: " << intervalo);
-      fichero << nodos_acceso << " " << acumulador_uso.Mean() << " " << intervalo << std::endl;
+      fichero << tasa_errores << " " << acumulador_uso.Mean() << " " << intervalo << std::endl;
   }
  }
  return 0;
 }
-#endif
