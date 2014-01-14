@@ -16,16 +16,16 @@ Servidor::Servidor(Ptr< Node > disp)
 void Servidor::RecibePaquete (Ptr<Socket> socket)
 {
 	NS_LOG_FUNCTION (this << socket);
-	while (m_socket->GetRxAvailable () > 0)
+	while (socket->GetRxAvailable () > 0)
 	{
 		Address from;
-		Ptr<Packet> p = m_socket->RecvFrom (0xffffffff, 0, from);
+		Ptr<Packet> p = socket->RecvFrom (0xffffffff, 0, from);
 		NS_LOG_DEBUG ("recv " << p->GetSize () << " bytes");
-		NS_ASSERT (InetSocketAddress::IsMatchingType (from));
-		InetSocketAddress realFrom = InetSocketAddress::ConvertFrom (from);
-		NS_ASSERT (realFrom.GetPort ()); // assure port 80 or 443
+		//NS_ASSERT (InetSocketAddress::IsMatchingType (from));
+		//InetSocketAddress realFrom = InetSocketAddress::ConvertFrom (from);
+		//NS_ASSERT (realFrom.GetPort ()); // assure port 80 or 443
 
-		RespondePaquete(realFrom.GetIpv4());
+		RespondePaquete(socket);
 	}
 }
 
@@ -33,19 +33,19 @@ void Servidor::AceptaConexion (Ptr<Socket> s, const Address& from)
 {
 	NS_LOG_FUNCTION (this << s << from);
 	s->SetRecvCallback (MakeCallback (&Servidor::RecibePaquete, this));
-	m_socketList.push_back (s);
+	// m_socketList.push_back (s);
 }
 
 /// Método que envía un nuevo paquete.
 /// Deberá iniciar el temporizador de retransmisiones
-void Servidor::RespondePaquete(const Ipv4Address &desde)
+void Servidor::RespondePaquete(Ptr<Socket> s)
 {
-	NS_LOG_FUNCTION(this << desde);
+	NS_LOG_FUNCTION(this << s);
 	//const char cadena_prueba[] = "hola";
 	//Ptr<Packet> paquetePrueba = new Packet((uint8_t *)cadena_prueba,strlen(cadena_prueba),true);
-	Ptr<Packet> enviar = new Packet(1000); // TODO Tamaño aleatorio
+	Ptr<Packet> enviar = new Packet(120); // TODO Tamaño aleatorio
 	
-	// m_socket->SendTo(enviar,0,desde);
+	s->Send(enviar);
 }
 
 // Método de inicialización de la aplicación. Instala el Callback.
@@ -63,10 +63,9 @@ void Servidor::DoInitialize()
  NS_ASSERT (status != -1);
  status = m_socket->Listen();
  
- m_socket->SetRecvCallback (MakeCallback (&Servidor::RecibePaquete, this));
- m_socket->SetAcceptCallback (
-  MakeNullCallback<bool, Ptr<Socket>, const Address &> (),
-  MakeCallback (&Servidor::AceptaConexion, this));
+  m_socket->SetAcceptCallback (
+    MakeNullCallback<bool, Ptr<Socket>, const Address &> (),
+    MakeCallback (&Servidor::AceptaConexion, this));
 
-  Application::DoInitialize();
+  // Application::DoInitialize();
 }

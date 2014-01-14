@@ -20,7 +20,7 @@ public:
   void RecibePaquete(ns3::Ptr<ns3::Socket> socket);
 
   // Método que envía un nuevo paquete.
-  void RespondePaquete(const ns3::Ipv4Address &desde);
+  void RespondePaquete(ns3::Ptr<ns3::Socket> s);
 
   void AceptaConexion (ns3::Ptr<ns3::Socket> s, const ns3::Address& from);
 
