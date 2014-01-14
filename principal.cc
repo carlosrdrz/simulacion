@@ -46,7 +46,7 @@ main ( int argc, char * argv[])
   std::string delay_1       = "0.002";
   std::string delay_2       = "0.002";
   std::string delay_t       = "0.002";
-  float tasa_errores        = 0.02;        
+  double tasa_errores        = 0.02;        
   int indice                = 0;   
   double tasa               = TASA;
   double tiempo             = T_FINAL-T_INICIO;
@@ -58,22 +58,22 @@ main ( int argc, char * argv[])
   std::string nombre_archivo_datos = "trabajo_final";
   
   CommandLine cmd;
-  cmd.AddValue("NumeroNodosAcceso",  "Número de nodos en la red de acceso 1", nodos_acceso);
+  cmd.AddValue("NumeroNodosAcceso",  "Número de nodos en la red de acceso 1",   nodos_acceso);
   cmd.AddValue("NumeroNodosEmpresa", "Número de nodos en la red de la empresa", nodos_empresa);
-  cmd.AddValue("NumeroNodosWifi",    "Número de nodos que usan wifi",         nodos_wifi);
-  cmd.AddValue("DataRate1",          "Capacidad de la red de acceso 1",       data_rate_1);
-  cmd.AddValue("DataRate2",          "Capacidad de la red de acceso 2",       data_rate_2);
-  cmd.AddValue("DataRatet",          "Capacidad de la red troncal",           data_rate_t);
-  cmd.AddValue("Delay1",             "Retardo de la red de acceso 1",         delay_1);
-  cmd.AddValue("Delay2",             "Retardo de la red de acceso 2",         delay_2);
-  cmd.AddValue("Delayt",             "Retardo de la red troncal",             delay_t);
+  cmd.AddValue("NumeroNodosWifi",    "Número de nodos que usan wifi",           nodos_wifi);
+  cmd.AddValue("DataRate1",          "Capacidad de la red de acceso 1",         data_rate_1);
+  cmd.AddValue("DataRate2",          "Capacidad de la red de acceso 2",         data_rate_2);
+  cmd.AddValue("DataRatet",          "Capacidad de la red troncal",             data_rate_t);
+  cmd.AddValue("Delay1",             "Retardo de la red de acceso 1",           delay_1);
+  cmd.AddValue("Delay2",             "Retardo de la red de acceso 2",           delay_2);
+  cmd.AddValue("Delayt",             "Retardo de la red troncal",               delay_t);
   cmd.Parse (argc, argv);
 
-for(nodos_acceso = 50; nodos_acceso <= 50; nodos_acceso+=5)
+for(nodos_acceso = 5; nodos_acceso <= 5; nodos_acceso+=5)
  {
   NS_LOG_INFO("El número de usuarios que acceden es: " << nodos_acceso);
   nodos_wifi = nodos_acceso;
-  for(tasa_errores = 0.06; tasa_errores <= 0.06; tasa_errores += 0.05)
+  for(tasa_errores = 0.1; tasa_errores <= 0.5; tasa_errores += 0.2)
   {
     NS_LOG_INFO("LA TASA DE ERRORES ES: " << tasa_errores);
     //Nombre variable del fichero de datos
