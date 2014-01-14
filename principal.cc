@@ -54,7 +54,10 @@ main ( int argc, char * argv[])
   uint16_t http_port        = 80;
   uint16_t udp_port         = 16600;
   uint16_t ftp_port         = 20;
-
+  //Nombre BASE del fichero de datos de salida
+  int numero_fichero        = 1;
+  std::string nombre_archivo_datos = "trabajo_final";
+  
   CommandLine cmd;
   cmd.AddValue("NumeroNodosAcceso",  "Número de nodos en la red de acceso 1", nodos_acceso);
   cmd.AddValue("NumeroNodosEmpresa", "Número de nodos en la red de la empresa", nodos_empresa);
@@ -72,6 +75,14 @@ main ( int argc, char * argv[])
   for(tasa_errores = 0.005; tasa_errores <= 0.005; tasa_errores += 0.005)
   {
     NS_LOG_INFO("LA TASA DE ERRORES ES: " << tasa_errores);
+    //Nombre variable del fichero de datos
+    std::stringstream stream;
+    std::string num;
+    stream << numero_fichero++;
+    num = stream.str();
+    //Nombre completo del fichero de salida
+    std::string nombreFichero = nombre_archivo_datos + num + ".dat";
+    std::ofstream fichero (nombreFichero.c_str(), std::ios_base::app);
     acumulador_uso.Reset ();
     for (indice = 0; indice <= 1; indice++)
     {
@@ -184,6 +195,8 @@ main ( int argc, char * argv[])
     }
       intervalo = sqrt(acumulador_uso.Var() / NUM_SIMULACIONES) * TSTUDENT;
       NS_LOG_INFO ("El intervalo de confianza es: " << intervalo);
+      fichero << tasa_errores << " " << acumulador_uso.Mean() << " " << intervalo << std::endl;
   }
  //}
+ return 0;
 }
