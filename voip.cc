@@ -41,7 +41,7 @@ VoipHelper::VoipHelper(Ipv4Address address, uint16_t port)
   varoff->SetAttribute("Max", DoubleValue(MAXOFFVOIP));
   varoff->SetAttribute("Min", DoubleValue(MINOFFVOIP));
   //Configuramos la aplicación OnOff
-  SetConstantRate (DataRate ("500kb/s"));
+  SetConstantRate (DataRate ("500kbps"));
   SetAttribute("OnTime", PointerValue(varon));
   SetAttribute("OffTime", PointerValue(varoff));
   

@@ -35,38 +35,40 @@ main ( int argc, char * argv[])
 
   Config::SetDefault ("ns3::CsmaNetDevice::EncapsulationMode", StringValue ("Dix"));
 
-  bool tracing              = true;
-  unsigned nodos_acceso     = 5;
-  unsigned nodos_empresa    = 3;
-  unsigned nodos_wifi       = 1;
-  double distance           = 50.0;
-  std::string data_rate_1   = "100Mbps";
-  std::string data_rate_2   = "100Mbps";
-  std::string data_rate_t   = "1Gbps";
-  std::string delay_1       = "0.002";
-  std::string delay_2       = "0.002";
-  std::string delay_t       = "0.002";
-  double tasa_errores        = 0.02;        
-  int indice                = 0;   
-  double tasa               = TASA;
-  double tiempo             = T_FINAL-T_INICIO;
-  double uso_enlace         = 0;      //Porcentaje de uso del enlace que devolverá el método ImprimeTrazas
+  bool tracing                     = true;
+  unsigned nodos_acceso;
+  unsigned nodos_acceso_min        = 3;
+  unsigned nodos_acceso_max        = 15;
+  unsigned nodos_acceso_step       = 3;
+  unsigned nodos_wifi;
+  double distance                  = 50.0;
+  std::string data_rate_1          = "100Mbps";
+  std::string data_rate_2          = "100Mbps";
+  std::string data_rate_t          = "1Gbps";
+  std::string delay_1              = "0.002";
+  std::string delay_2              = "0.002";
+  std::string delay_t              = "0.002";
+  double tasa_errores              = 0.02;        
+  int indice                       = 0;   
+  double tasa                      = TASA;
+  double tiempo                    = T_FINAL-T_INICIO;
+  double uso_enlace                = 0;      //Porcentaje de uso del enlace que devolverá el método ImprimeTrazas
   Average<double> acumulador_uso;  
-  double intervalo          = 0;
+  double intervalo                 = 0;
   //Nombre BASE del fichero de datos de salida
-  int numero_fichero        = 1;
+  int numero_fichero               = 1;
   std::string nombre_archivo_datos = "trabajo_final";
   
   CommandLine cmd;
-  cmd.AddValue("NumeroNodosAcceso",  "Número de nodos en la red de acceso 1",   nodos_acceso);
-  cmd.AddValue("NumeroNodosEmpresa", "Número de nodos en la red de la empresa", nodos_empresa);
-  cmd.AddValue("NumeroNodosWifi",    "Número de nodos que usan wifi",           nodos_wifi);
-  cmd.AddValue("DataRate1",          "Capacidad de la red de acceso 1",         data_rate_1);
-  cmd.AddValue("DataRate2",          "Capacidad de la red de acceso 2",         data_rate_2);
-  cmd.AddValue("DataRatet",          "Capacidad de la red troncal",             data_rate_t);
-  cmd.AddValue("Delay1",             "Retardo de la red de acceso 1",           delay_1);
-  cmd.AddValue("Delay2",             "Retardo de la red de acceso 2",           delay_2);
-  cmd.AddValue("Delayt",             "Retardo de la red troncal",               delay_t);
+  cmd.AddValue("NumeroNodosAccesoMax",    "Número de nodos maximos en la red de acceso",   nodos_acceso_max);
+  cmd.AddValue("NumeroNodosAccesoMin",    "Número de nodos minimos en la red de acceso",   nodos_acceso_min);
+  cmd.AddValue("NumeroNodosAccesoStep",   "Paso de número de nodos en la red de acceso",   nodos_acceso_step);
+  cmd.AddValue("DataRate1",               "Capacidad de la red de acceso 1",               data_rate_1);
+  cmd.AddValue("DataRate2",               "Capacidad de la red de acceso 2",               data_rate_2);
+  cmd.AddValue("DataRatet",               "Capacidad de la red troncal",                   data_rate_t);
+  cmd.AddValue("Delay1",                  "Retardo de la red de acceso 1",                 delay_1);
+  cmd.AddValue("Delay2",                  "Retardo de la red de acceso 2",                 delay_2);
+  cmd.AddValue("Delayt",                  "Retardo de la red troncal",                     delay_t);
   cmd.Parse (argc, argv);
 
   std::stringstream stream;
@@ -77,7 +79,7 @@ main ( int argc, char * argv[])
   std::string nombreFichero = nombre_archivo_datos + num + ".dat";
   std::ofstream fichero (nombreFichero.c_str(), std::ios_base::app);
 
-for(nodos_acceso = 3; nodos_acceso <= 15; nodos_acceso+=3)
+for(nodos_acceso = nodos_acceso_min; nodos_acceso <= nodos_acceso_max; nodos_acceso += nodos_acceso_step)
  {
   nodos_wifi = nodos_acceso;
   NS_LOG_INFO("El número de usuarios que acceden es: " << nodos_acceso << " por CSMA, y " << nodos_wifi << " por wifi");
@@ -96,7 +98,7 @@ for(nodos_acceso = 3; nodos_acceso <= 15; nodos_acceso+=3)
       NS_LOG_INFO ("Creando Topologia");
       topologia.AddContainer ("troncal", 2);
       topologia.AddContainer ("acceso", nodos_acceso);
-      topologia.AddContainer ("empresa", nodos_empresa);
+      topologia.AddContainer ("empresa", 3);
       topologia.AddContainer ("wifi", nodos_wifi);
 
       // Añadimos los routers para formar las subredes
